@@ -71,7 +71,7 @@ export const getAllInventory = async (): Promise<InventoryItem[]> => {
 
 // 添加库存商品
 export const addInventoryItem = async (item: Omit<InventoryItem, 'id'>): Promise<number> => {
-  return await db.inventory.add(item);
+  return (await db.inventory.add(item)) as number;
 };
 
 // 更新库存商品
@@ -99,7 +99,7 @@ export const getAllEmployees = async (): Promise<Employee[]> => {
 
 // 添加员工
 export const addEmployee = async (employee: Omit<Employee, 'id'>): Promise<number> => {
-  return await db.employees.add(employee);
+  return (await db.employees.add(employee)) as number;
 };
 
 // 更新员工信息
@@ -143,7 +143,7 @@ export const getAttendanceByDateRange = async (
 
 // 添加考勤记录
 export const addAttendance = async (attendance: Omit<AttendanceRecord, 'id'>): Promise<number> => {
-  return await db.attendance.add(attendance);
+  return (await db.attendance.add(attendance)) as number;
 };
 
 // 更新考勤记录

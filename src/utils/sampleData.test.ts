@@ -71,7 +71,7 @@ describe('示例数据测试', () => {
   });
 
   it('默认应返回中文数据', () => {
-    const data = getSampleData('invalid' as any);
+    const data = getSampleData('invalid' as unknown as 'zh');
     expect(data.employees[0].name).toBe('李晓明');
   });
 });

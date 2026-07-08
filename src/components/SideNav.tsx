@@ -24,25 +24,28 @@ export const SideNav: React.FC<SideNavProps> = ({ items, activeTab, onTabChange 
   };
 
   return (
-    <aside className="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 md:sticky md:top-0 md:h-screen bg-white border-r border-cream-200 shadow-sm z-40">
-      <div className="px-6 py-5 border-b border-cream-200">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">☕️</span>
-          <div>
-            <p className="font-bold text-coffee-700 leading-tight text-sm">{appTitles[language]}</p>
+    <aside className="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 md:min-h-screen bg-white border-r border-gray-200 z-40">
+      <div className="p-4">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">☕️</span>
+            <div>
+              <p className="font-bold text-coffee-700 leading-tight text-sm">{appTitles[language]}</p>
+              <p className="text-xs text-coffee-400">Inventory Dashboard</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 pb-3 space-y-1 overflow-y-auto">
         {items.map(item => (
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
               activeTab === item.id
-                ? 'bg-coffee-500 text-white shadow-md'
-                : 'text-coffee-600 hover:bg-cream-100'
+                ? 'bg-coffee-600 text-white'
+                : 'text-coffee-600 hover:bg-gray-100'
             }`}
           >
             <Icon
@@ -55,6 +58,12 @@ export const SideNav: React.FC<SideNavProps> = ({ items, activeTab, onTabChange 
           </button>
         ))}
       </nav>
+
+      <div className="p-4 border-t border-gray-200">
+        <div className="rounded-lg bg-gray-100 px-3 py-2 text-xs text-coffee-500">
+          Designed for modern cafe operations
+        </div>
+      </div>
     </aside>
   );
 };

@@ -15,15 +15,15 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ items, activeTab, onTabChange }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-cream-200 shadow-lg z-50 md:hidden">
-      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-sm z-50 md:hidden">
+      <div className="flex justify-around items-center h-[68px] max-w-lg mx-auto px-2">
         {items.map(item => (
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
-            className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+            className={`flex flex-col items-center justify-center flex-1 h-[54px] rounded-2xl transition-all ${
               activeTab === item.id
-                ? 'text-coffee-600'
+                ? 'text-coffee-700 bg-gray-100'
                 : 'text-coffee-300 hover:text-coffee-500'
             }`}
           >

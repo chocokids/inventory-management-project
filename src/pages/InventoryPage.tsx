@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
@@ -15,6 +15,7 @@ import {
 import { generateAndDownloadPurchaseList } from '../utils/generateMarkdown';
 import { PageLayout } from '../components/PageLayout';
 import { useLanguage } from '../i18n/LanguageContext';
+import { StatCard } from '../components/StatCard';
 
 export const InventoryPage: React.FC = () => {
   const { t, language } = useLanguage();
@@ -87,20 +88,12 @@ export const InventoryPage: React.FC = () => {
     return categoryMap[categoryKey] || categoryKey;
   };
 
-  useEffect(() => {
-    loadInventory();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [inventory, filterCategory, filterLowStock, searchKeyword]);
-
-  const loadInventory = async () => {
+  const loadInventory = useCallback(async () => {
     const items = await getAllInventory();
     setInventory(items);
-  };
+  }, []);
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...inventory];
 
     // 按关键字搜索
@@ -141,7 +134,15 @@ export const InventoryPage: React.FC = () => {
     });
 
     setFilteredInventory(filtered);
-  };
+  }, [inventory, filterCategory, filterLowStock, searchKeyword]);
+
+  useEffect(() => {
+    loadInventory();
+  }, [loadInventory]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   const resetFilters = () => {
     setFilterCategory('all');
@@ -234,93 +235,86 @@ export const InventoryPage: React.FC = () => {
   return (
     <PageLayout>
       {/* Header with Action Buttons */}
-      <div className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-1">
+      <div className="max-w-3xl mb-6">
+        <div className="flex items-start justify-between gap-3 mb-1">
           <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
             <Icon name="inventory_2" size={28} />
             {t.inventory.title}
           </h1>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0">
             <button
               onClick={() => handleOpenModal()}
-              className="w-10 h-10 flex items-center justify-center bg-coffee-500 text-white rounded-lg shadow hover:bg-coffee-600 transition-all"
+              className="w-11 h-11 flex items-center justify-center bg-gradient-to-br from-coffee-500 to-coffee-600 text-white rounded-xl shadow-md shadow-coffee-300/40 hover:-translate-y-0.5 hover:shadow-lg transition-all"
               title={t.inventory.addProduct}
             >
               <Icon name="add" className="text-white" size={24} />
             </button>
             <button
               onClick={handleGeneratePurchaseList}
-              className="w-10 h-10 flex items-center justify-center bg-cream-200 text-coffee-600 rounded-lg shadow hover:bg-cream-300 transition-all"
+              className="w-11 h-11 flex items-center justify-center bg-white border border-cream-300 text-coffee-600 rounded-xl shadow-sm hover:bg-cream-100 transition-all"
               title={t.inventory.generatePurchaseList}
             >
               <Icon name="description" size={24} />
             </button>
           </div>
         </div>
-        <p className="text-sm text-coffee-400">{t.inventory.subtitle}</p>
+        <p className="text-sm text-coffee-500">{t.inventory.subtitle}</p>
       </div>
 
-      {/* Search Bar and Filter Toggle */}
-      <div className="flex gap-2 mb-3">
-        {/* Search Bar */}
-        <div className="relative flex-1">
-          <Icon 
-            name="search" 
-            size={20} 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400 pointer-events-none"
-          />
-          <input
-            type="text"
-            placeholder={t.inventory.searchPlaceholder}
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-            className="w-full pl-10 pr-10 py-2.5 border border-coffee-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee-400 focus:border-transparent text-sm"
-          />
-          {searchKeyword && (
-            <button
-              onClick={() => setSearchKeyword('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-coffee-400 hover:text-coffee-600"
-            >
-              <Icon name="close" size={18} />
-            </button>
-          )}
+      {/* Search Bar and Filter Toggle, plus Quick Stats - grouped with explicit gap to avoid margin collapse */}
+      <div className="max-w-3xl flex flex-col gap-4 mb-8">
+        <div className="flex gap-2">
+          {/* Search Bar */}
+          <div className="relative flex-1">
+            <Icon 
+              name="search" 
+              size={20} 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400 pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder={t.inventory.searchPlaceholder}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 border border-cream-300 bg-white/90 rounded-xl focus:outline-none focus:ring-2 focus:ring-coffee-300 focus:border-coffee-300 text-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
+            />
+            {searchKeyword && (
+              <button
+                onClick={() => setSearchKeyword('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-coffee-400 hover:text-coffee-600"
+              >
+                <Icon name="close" size={18} />
+              </button>
+            )}
+          </div>
+
+          {/* Filter Toggle Button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="px-3 py-2.5 bg-white border border-cream-300 rounded-xl text-sm font-medium text-coffee-600 hover:bg-cream-50 transition-all flex items-center gap-1.5 flex-shrink-0 shadow-sm"
+            title={t.inventory.advancedFilter}
+          >
+            <Icon name="filter_list" size={20} />
+            {hasActiveFilters() && (
+              <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                {(filterCategory !== 'all' ? 1 : 0) + (filterLowStock ? 1 : 0) + (searchKeyword.trim() ? 1 : 0)}
+              </span>
+            )}
+            <Icon name={showFilters ? 'expand_less' : 'expand_more'} size={16} />
+          </button>
         </div>
 
-        {/* Filter Toggle Button */}
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="px-3 py-2.5 bg-white border border-cream-300 rounded-lg text-sm font-medium text-coffee-600 hover:bg-cream-50 transition-all flex items-center gap-1.5 flex-shrink-0"
-          title={t.inventory.advancedFilter}
-        >
-          <Icon name="filter_list" size={20} />
-          {hasActiveFilters() && (
-            <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
-              {(filterCategory !== 'all' ? 1 : 0) + (filterLowStock ? 1 : 0) + (searchKeyword.trim() ? 1 : 0)}
-            </span>
-          )}
-          <Icon name={showFilters ? 'expand_less' : 'expand_more'} size={16} />
-        </button>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-3">
-        <div className="bg-cream-100 rounded-lg p-2 text-center">
-          <p className="text-xs text-coffee-500">{t.inventory.totalItems}</p>
-          <p className="text-lg font-bold text-coffee-700">{inventory.length}</p>
-        </div>
-        <div className="bg-red-50 rounded-lg p-2 text-center">
-          <p className="text-xs text-red-600">{t.inventory.lowStock}</p>
-          <p className="text-lg font-bold text-red-600">{getLowStockCount()}</p>
-        </div>
-        <div className="bg-blue-50 rounded-lg p-2 text-center">
-          <p className="text-xs text-blue-600">{t.inventory.filterResult}</p>
-          <p className="text-lg font-bold text-blue-700">{getFilteredCount()}</p>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
+          <StatCard label={t.inventory.totalItems} value={inventory.length} tone="default" />
+          <StatCard label={t.inventory.lowStock} value={getLowStockCount()} tone="danger" />
+          <StatCard label={t.inventory.filterResult} value={getFilteredCount()} tone="info" />
         </div>
       </div>
 
       {/* Filters (Collapsible) */}
       {showFilters && (
-        <Card className="mb-4">
+        <Card className="max-w-3xl mt-6 mb-6">
         <div className="space-y-3">
           {/* Category Filter */}
           <div>
@@ -396,9 +390,9 @@ export const InventoryPage: React.FC = () => {
       )}
 
       {/* Inventory List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="max-w-3xl mt-4 pt-3 space-y-3">
         {inventory.length === 0 ? (
-          <Card className="md:col-span-2 xl:col-span-3">
+          <Card>
             <div className="text-center py-8 text-coffee-400">
               <p className="text-4xl mb-2">📦</p>
               <p>{t.inventory.noProducts}</p>
@@ -406,7 +400,7 @@ export const InventoryPage: React.FC = () => {
             </div>
           </Card>
         ) : filteredInventory.length === 0 ? (
-          <Card className="md:col-span-2 xl:col-span-3">
+          <Card>
             <div className="text-center py-8 text-coffee-400">
               <p className="text-4xl mb-2">🔍</p>
               <p>{t.inventory.noFilterResults}</p>
@@ -425,20 +419,22 @@ export const InventoryPage: React.FC = () => {
           filteredInventory.map(item => (
             <div
               key={item.id}
-              className={`bg-white rounded-lg p-2.5 shadow hover:shadow-md transition-shadow ${
-                isLowStock(item) ? 'border-l-4 border-red-500' : 'border-l-4 border-transparent'
+              className={`rounded-2xl p-3 sm:p-4 border bg-white/95 transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                isLowStock(item)
+                  ? 'border-red-200 shadow-[0_8px_24px_-18px_rgba(239,68,68,0.55)]'
+                  : 'border-cream-200/90 shadow-[0_8px_24px_-18px_rgba(0,0,0,0.35)]'
               }`}
             >
               {/* Header Row - Name and Category in one line */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
                   <h3 className="font-semibold text-coffee-700 truncate">{item.name}</h3>
                   <span className="text-xs text-coffee-400 px-1.5 py-0.5 bg-cream-100 rounded flex-shrink-0">
                     {getCategoryLabel(item.category)}
                   </span>
                 </div>
                 {isLowStock(item) && (
-                  <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded flex-shrink-0 ml-2 flex items-center">
+                  <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full flex-shrink-0 flex items-center gap-1">
                     <Icon name="warning" size={14} />
                   </span>
                 )}

@@ -673,6 +673,7 @@ export const translations = {
       subtitle: 'Record and manage employee attendance',
       addAttendance: 'Add Attendance',
       editAttendance: 'Edit Attendance',
+      selectEmployee: 'Select Employee',
       employeeName: 'Employee',
       date: 'Date',
       clockIn: 'Clock In',

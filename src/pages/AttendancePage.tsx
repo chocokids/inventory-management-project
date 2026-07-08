@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
@@ -18,6 +18,7 @@ import {
 import { generateAndDownloadPayroll } from '../utils/generatePayroll';
 import { useLanguage } from '../i18n/LanguageContext';
 import { PageLayout } from '../components/PageLayout';
+import { StatCard } from '../components/StatCard';
 
 export const AttendancePage: React.FC = () => {
   const { t, language } = useLanguage();
@@ -59,15 +60,7 @@ export const AttendancePage: React.FC = () => {
     return positionMap[positionKey] || positionKey;
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [attendance, filterEmployeeId, filterStartDate, filterEndDate]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     const [attendanceData, employeeData] = await Promise.all([
       getAllAttendance(),
       getAllEmployees(),
@@ -82,9 +75,9 @@ export const AttendancePage: React.FC = () => {
         employeeName: employeeData[0].name,
       }));
     }
-  };
+  }, [formData.employeeId]);
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...attendance];
 
     // 按员工筛选
@@ -105,7 +98,15 @@ export const AttendancePage: React.FC = () => {
     }
 
     setFilteredAttendance(filtered);
-  };
+  }, [attendance, filterEmployeeId, filterStartDate, filterEndDate]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   const resetFilters = () => {
     setFilterEmployeeId(0);
@@ -232,7 +233,7 @@ export const AttendancePage: React.FC = () => {
   return (
     <PageLayout>
       {/* Header with Action Button */}
-      <div className="mb-6">
+      <div className="max-w-3xl mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-1">
           <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
             <Icon name="event_note" size={28} />
@@ -240,17 +241,17 @@ export const AttendancePage: React.FC = () => {
           </h1>
           <button
             onClick={() => handleOpenModal()}
-            className="w-10 h-10 flex items-center justify-center bg-coffee-500 text-white rounded-lg shadow hover:bg-coffee-600 transition-all"
+            className="w-11 h-11 flex items-center justify-center bg-gradient-to-br from-coffee-500 to-coffee-600 text-white rounded-xl shadow-md shadow-coffee-300/40 hover:-translate-y-0.5 hover:shadow-lg transition-all"
             title={t.attendance.addAttendance}
           >
             <Icon name="add" className="text-white" size={24} />
           </button>
         </div>
-        <p className="text-sm text-coffee-400">{t.attendance.subtitle}</p>
+        <p className="text-sm text-coffee-500">{t.attendance.subtitle}</p>
       </div>
 
       {/* Today Summary & Payroll */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div className="max-w-3xl grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
       <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 mb-0">
         <h3 className="font-semibold text-coffee-700 mb-3 flex items-center gap-2">
           <Icon name="today" size={20} />
@@ -308,31 +309,32 @@ export const AttendancePage: React.FC = () => {
       </Card>
       </div>
 
-      {/* Recent Attendance */}
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-coffee-700 flex items-center gap-2">
-          <Icon name="event_note" size={24} />
-          <span>{t.attendance.title}</span>
-        </h2>
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="px-3 py-2 bg-white border border-cream-300 rounded-lg text-sm font-medium text-coffee-600 hover:bg-cream-50 transition-all flex items-center gap-1.5"
-          title={t.inventory.advancedFilter}
-        >
-          <Icon name="filter_list" size={20} />
-          {hasActiveFilters() && (
-            <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
-              {(filterEmployeeId > 0 ? 1 : 0) + (filterStartDate ? 1 : 0) + (filterEndDate ? 1 : 0)}
-            </span>
-          )}
-          <Icon name={showFilters ? 'expand_less' : 'expand_more'} size={16} />
-        </button>
-      </div>
+      <div className="max-w-3xl space-y-8">
+        {/* Recent Attendance */}
+        <div className="flex items-center justify-between py-1">
+          <h2 className="text-lg font-semibold text-coffee-700 flex items-center gap-2">
+            <Icon name="event_note" size={24} />
+            <span>{t.attendance.title}</span>
+          </h2>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="px-3 py-2 bg-white border border-cream-300 rounded-xl text-sm font-medium text-coffee-600 hover:bg-cream-50 transition-all flex items-center gap-1.5 shadow-sm"
+            title={t.inventory.advancedFilter}
+          >
+            <Icon name="filter_list" size={20} />
+            {hasActiveFilters() && (
+              <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                {(filterEmployeeId > 0 ? 1 : 0) + (filterStartDate ? 1 : 0) + (filterEndDate ? 1 : 0)}
+              </span>
+            )}
+            <Icon name={showFilters ? 'expand_less' : 'expand_more'} size={16} />
+          </button>
+        </div>
 
-      {/* Filters */}
-      {showFilters && (
-        <Card className="mb-4">
-          <div className="space-y-3">
+        {/* Filters */}
+        {showFilters && (
+          <Card className="mb-0">
+            <div className="space-y-3">
             {/* Employee Filter */}
             <div>
               <label className="block text-sm font-medium text-coffee-700 mb-2">
@@ -407,30 +409,23 @@ export const AttendancePage: React.FC = () => {
               </div>
             )}
           </div>
-        </Card>
-      )}
+          </Card>
+        )}
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-3">
-        <div className="bg-cream-100 rounded-lg p-2 text-center">
-          <p className="text-xs text-coffee-500">{t.common.total}</p>
-          <p className="text-lg font-bold text-coffee-700">{attendance.length}</p>
+        {/* Summary Stats */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <StatCard label={t.common.total} value={attendance.length} tone="default" />
+          <StatCard label={t.inventory.filterResult} value={filteredAttendance.length} tone="info" />
+          <StatCard
+            label={t.attendance.totalHours}
+            value={`${filteredAttendance.reduce((sum, r) => sum + r.hoursWorked, 0).toFixed(1)}h`}
+            tone="success"
+          />
         </div>
-        <div className="bg-blue-50 rounded-lg p-2 text-center">
-          <p className="text-xs text-blue-600">{t.inventory.filterResult}</p>
-          <p className="text-lg font-bold text-blue-700">{filteredAttendance.length}</p>
-        </div>
-        <div className="bg-green-50 rounded-lg p-2 text-center">
-          <p className="text-xs text-green-600">{t.attendance.totalHours}</p>
-          <p className="text-lg font-bold text-green-700">
-            {filteredAttendance.reduce((sum, r) => sum + r.hoursWorked, 0).toFixed(1)}h
-          </p>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="space-y-3">
         {attendance.length === 0 ? (
-          <Card className="md:col-span-2 xl:col-span-3">
+          <Card>
             <div className="text-center py-8 text-coffee-400">
               <Icon name="event_note" size={48} className="mx-auto mb-2" />
               <p>{t.attendance.noAttendance}</p>
@@ -438,7 +433,7 @@ export const AttendancePage: React.FC = () => {
             </div>
           </Card>
         ) : filteredAttendance.length === 0 ? (
-          <Card className="md:col-span-2 xl:col-span-3">
+          <Card>
             <div className="text-center py-8 text-coffee-400">
               <p className="text-4xl mb-2">🔍</p>
               <p>{t.inventory.noFilterResults}</p>
@@ -456,7 +451,7 @@ export const AttendancePage: React.FC = () => {
         ) : (
           getRecentAttendance().map(record => (
             <Card key={record.id} className="hover:shadow-xl transition-shadow">
-              <div className="flex items-start justify-between mb-2">
+              <div className="flex items-start justify-between mb-3">
                 <div>
                   <h3 className="font-semibold text-coffee-700 flex items-center gap-2">
                     <Icon name="person" size={18} />
@@ -510,6 +505,7 @@ export const AttendancePage: React.FC = () => {
             </Card>
           ))
         )}
+        </div>
       </div>
 
       {attendance.length > 10 && (

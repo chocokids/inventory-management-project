@@ -1,4 +1,4 @@
-import { expect, afterEach, vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -14,10 +14,10 @@ const indexedDB = {
   databases: vi.fn(),
 };
 
-global.indexedDB = indexedDB as any;
+Object.defineProperty(globalThis, 'indexedDB', {
+  value: indexedDB,
+  writable: true,
+});
 
-// Mock window.alert
-global.alert = vi.fn();
-
-// Mock window.confirm
-global.confirm = vi.fn(() => true);
+window.alert = vi.fn();
+window.confirm = vi.fn(() => true);

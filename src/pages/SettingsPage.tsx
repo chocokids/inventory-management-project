@@ -6,6 +6,10 @@ import { initializeSampleData } from '../utils/db';
 import { useLanguage } from '../i18n/LanguageContext';
 import { PageLayout } from '../components/PageLayout';
 
+type ImportedInventoryRow = { lastUpdated: string } & Record<string, unknown>;
+type ImportedEmployeeRow = { hireDate: string } & Record<string, unknown>;
+type ImportedAttendanceRow = { date: string } & Record<string, unknown>;
+
 export const SettingsPage: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
 
@@ -102,7 +106,7 @@ export const SettingsPage: React.FC = () => {
           // 导入库存数据
           if (importData.data.inventory && Array.isArray(importData.data.inventory)) {
             await db.inventory.clear();
-            const inventoryData = importData.data.inventory.map((item: any) => ({
+            const inventoryData = importData.data.inventory.map((item: ImportedInventoryRow) => ({
               ...item,
               lastUpdated: new Date(item.lastUpdated),
             }));
@@ -112,7 +116,7 @@ export const SettingsPage: React.FC = () => {
           // 导入员工数据
           if (importData.data.employees && Array.isArray(importData.data.employees)) {
             await db.employees.clear();
-            const employeeData = importData.data.employees.map((item: any) => ({
+            const employeeData = importData.data.employees.map((item: ImportedEmployeeRow) => ({
               ...item,
               hireDate: new Date(item.hireDate),
             }));
@@ -122,7 +126,7 @@ export const SettingsPage: React.FC = () => {
           // 导入考勤数据
           if (importData.data.attendance && Array.isArray(importData.data.attendance)) {
             await db.attendance.clear();
-            const attendanceData = importData.data.attendance.map((item: any) => ({
+            const attendanceData = importData.data.attendance.map((item: ImportedAttendanceRow) => ({
               ...item,
               date: new Date(item.date),
             }));
@@ -156,15 +160,15 @@ export const SettingsPage: React.FC = () => {
   return (
     <PageLayout>
       {/* Header */}
-      <div className="mb-6">
+      <div className="max-w-4xl mb-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
           <Icon name="settings" size={28} />
           {t.settings.title}
         </h1>
-        <p className="text-sm text-coffee-400 mt-1">{t.settings.subtitle}</p>
+        <p className="text-sm text-coffee-500 mt-1">{t.settings.subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Language Settings */}
       <Card className="mb-0" title={t.settings.language}>
         <div className="space-y-3">
@@ -174,7 +178,7 @@ export const SettingsPage: React.FC = () => {
           <select
             value={language}
             onChange={(e) => handleLanguageChange(e.target.value as 'zh' | 'ja' | 'en')}
-            className="w-full px-4 py-2.5 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee-400 focus:border-transparent bg-white text-coffee-700 font-medium cursor-pointer"
+            className="w-full px-4 py-2.5 border border-cream-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-coffee-300 focus:border-coffee-300 bg-white text-coffee-700 font-medium cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
           >
             <option value="zh">🇨🇳 {t.settings.languages.zh}</option>
             <option value="ja">🇯🇵 {t.settings.languages.ja}</option>
@@ -263,7 +267,7 @@ export const SettingsPage: React.FC = () => {
 
       {/* Features */}
       <Card className="mb-0" title={t.settings.features}>
-        <div className="space-y-2 text-sm text-coffee-600">
+        <div className="space-y-3 text-sm text-coffee-600">
           <div className="flex items-start gap-2">
             <Icon name="check_circle" size={18} className="text-green-600 flex-shrink-0" />
             <span>{t.settings.featuresList.inventory}</span>
@@ -291,28 +295,6 @@ export const SettingsPage: React.FC = () => {
           <div className="flex items-start gap-2">
             <Icon name="check_circle" size={18} className="text-green-600 flex-shrink-0" />
             <span>{t.settings.featuresList.pwaSupport}</span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Tech Stack */}
-      <Card className="mb-0" title={t.settings.techStack}>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
-          <div className="bg-cream-100 p-2 rounded-lg">
-            <p className="text-coffee-400">{t.settings.tech.frontend}</p>
-            <p className="font-semibold text-coffee-700">React + TypeScript</p>
-          </div>
-          <div className="bg-cream-100 p-2 rounded-lg">
-            <p className="text-coffee-400">{t.settings.tech.buildTool}</p>
-            <p className="font-semibold text-coffee-700">Vite</p>
-          </div>
-          <div className="bg-cream-100 p-2 rounded-lg">
-            <p className="text-coffee-400">{t.settings.tech.uiFramework}</p>
-            <p className="font-semibold text-coffee-700">TailwindCSS</p>
-          </div>
-          <div className="bg-cream-100 p-2 rounded-lg">
-            <p className="text-coffee-400">{t.settings.tech.database}</p>
-            <p className="font-semibold text-coffee-700">Dexie.js</p>
           </div>
         </div>
       </Card>

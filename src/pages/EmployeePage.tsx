@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
@@ -15,6 +15,7 @@ import {
 } from '../utils/db';
 import { useLanguage } from '../i18n/LanguageContext';
 import { PageLayout } from '../components/PageLayout';
+import { StatCard } from '../components/StatCard';
 
 export const EmployeePage: React.FC = () => {
   const { t } = useLanguage();
@@ -59,11 +60,7 @@ export const EmployeePage: React.FC = () => {
     return positionMap[positionKey] || positionKey;
   };
 
-  useEffect(() => {
-    loadEmployees();
-  }, []);
-
-  const loadEmployees = async () => {
+  const loadEmployees = useCallback(async () => {
     const items = await getAllEmployees();
     setEmployees(items);
     
@@ -80,7 +77,11 @@ export const EmployeePage: React.FC = () => {
     }
     setEmployeeHours(hoursMap);
     setEmployeeWorkDays(workDaysMap);
-  };
+  }, [currentMonth.year, currentMonth.month]);
+
+  useEffect(() => {
+    loadEmployees();
+  }, [loadEmployees]);
 
   const handleOpenModal = (employee?: Employee) => {
     if (employee) {
@@ -164,54 +165,56 @@ export const EmployeePage: React.FC = () => {
   return (
     <PageLayout>
       {/* Header */}
-      <div className="mb-6">
+      <div className="max-w-3xl mb-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
           <Icon name="group" size={28} />
           {t.employees.title}
         </h1>
-        <p className="text-sm text-coffee-400 mt-1">{t.employees.subtitle}</p>
+        <p className="text-sm text-coffee-500 mt-1">{t.employees.subtitle}</p>
       </div>
 
-      {/* Summary Card */}
-      <Card className="mb-4 bg-gradient-to-br from-coffee-100 to-cream-100">
-        <div className="mb-3">
-          <p className="text-xs text-coffee-500 mb-1">
+      <div className="max-w-3xl space-y-8">
+        {/* Summary Stats */}
+        <div>
+          <p className="text-xs text-coffee-500 mb-2">
             📅 {currentMonth.year}{t.attendance.year}{currentMonth.month}{t.attendance.month} {t.employees.monthStats}
           </p>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
+            <StatCard
+              label={t.employees.totalEmployees}
+              value={employees.length}
+              hint={t.employees.people}
+              tone="default"
+            />
+            <StatCard
+              label={t.employees.monthlyHours}
+              value={getTotalHours().toFixed(1)}
+              hint={t.employees.hours}
+              tone="info"
+            />
+            <StatCard
+              label={t.employees.monthlySalary}
+              value={`${t.employees.currency}${getTotalSalary().toFixed(0)}`}
+              hint={t.employees.yuan}
+              tone="success"
+            />
+          </div>
         </div>
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div>
-            <p className="text-xs text-coffee-600">{t.employees.totalEmployees}</p>
-            <p className="text-xl font-bold text-coffee-700">{employees.length}</p>
-            <p className="text-xs text-coffee-400">{t.employees.people}</p>
-          </div>
-          <div>
-            <p className="text-xs text-coffee-600">{t.employees.monthlyHours}</p>
-            <p className="text-xl font-bold text-coffee-700">{getTotalHours().toFixed(1)}</p>
-            <p className="text-xs text-coffee-400">{t.employees.hours}</p>
-          </div>
-          <div>
-            <p className="text-xs text-coffee-600">{t.employees.monthlySalary}</p>
-            <p className="text-xl font-bold text-coffee-700">{t.employees.currency}{getTotalSalary().toFixed(0)}</p>
-            <p className="text-xs text-coffee-400">{t.employees.yuan}</p>
-          </div>
-        </div>
-      </Card>
 
-      {/* Add Button */}
-      <Button
-        variant="primary"
-        className="w-full mb-4 flex items-center justify-center gap-2"
-        onClick={() => handleOpenModal()}
-      >
-        <Icon name="add" size={20} />
-        <span>{t.employees.addEmployee}</span>
-      </Button>
+        {/* Add Button */}
+        <Button
+          variant="primary"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={() => handleOpenModal()}
+        >
+          <Icon name="add" size={20} />
+          <span>{t.employees.addEmployee}</span>
+        </Button>
 
-      {/* Employee List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {/* Employee List */}
+        <div className="space-y-3">
         {employees.length === 0 ? (
-          <Card className="md:col-span-2 xl:col-span-3">
+          <Card>
             <div className="text-center py-8 text-coffee-400">
               <Icon name="group" size={48} className="mx-auto mb-2" />
               <p>{t.employees.noEmployees}</p>
@@ -241,7 +244,7 @@ export const EmployeePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-sm mb-3 bg-cream-50 p-2 rounded-lg">
+                <div className="grid grid-cols-2 gap-2 text-sm mb-4 bg-cream-50 p-3 rounded-lg">
                   <div>
                     <span className="text-coffee-400">{t.employees.hourlyRate}：</span>
                     <span className="text-coffee-700 font-medium">{t.employees.currency}{employee.hourlyRate}/h</span>
@@ -307,6 +310,7 @@ export const EmployeePage: React.FC = () => {
             );
           })
         )}
+        </div>
       </div>
 
       {/* Add/Edit Modal */}

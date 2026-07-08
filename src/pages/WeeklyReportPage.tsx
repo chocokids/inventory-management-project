@@ -6,6 +6,7 @@ import { getLowStockItems, InventoryItem } from '../utils/db';
 import { generateAndDownloadPurchaseList } from '../utils/generateMarkdown';
 import { useLanguage } from '../i18n/LanguageContext';
 import { PageLayout } from '../components/PageLayout';
+import { StatCard } from '../components/StatCard';
 
 export const WeeklyReportPage: React.FC = () => {
   const { t, language } = useLanguage();
@@ -68,26 +69,28 @@ export const WeeklyReportPage: React.FC = () => {
     return unitMap[unitKey] || unitKey;
   };
 
+  const urgentItemsCount = lowStockItems.filter(item => item.quantity <= item.threshold / 2).length;
+  const affectedCategoriesCount = ['ingredients', 'supplies', 'cleaning', 'equipment', 'other']
+    .filter(category => getCategoryCount(category) > 0).length;
+
   return (
     <PageLayout>
       {/* Header */}
-      <div className="mb-6">
+      <div className="max-w-3xl mb-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
           <Icon name="assessment" size={28} />
           {t.reports.title}
         </h1>
-        <p className="text-sm text-coffee-400 mt-1">{t.reports.subtitle}</p>
+        <p className="text-sm text-coffee-500 mt-1">{t.reports.subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div className="max-w-3xl grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       {/* Summary Card */}
-      <Card className="mb-0 bg-gradient-to-br from-red-50 to-orange-50">
-        <div className="text-center">
-          <p className="text-sm text-coffee-600 mb-2">{t.reports.lowStockCount}</p>
-          <p className="text-5xl font-bold text-red-600 mb-2">{lowStockItems.length}</p>
-          <p className="text-xs text-coffee-500">
-            {lowStockItems.length > 0 ? t.reports.needRestock : t.reports.stockGood}
-          </p>
+      <Card className="mb-0">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <StatCard label={t.reports.lowStockCount} value={lowStockItems.length} tone="danger" />
+          <StatCard label={t.reports.categoryBreakdown} value={affectedCategoriesCount} tone="info" />
+          <StatCard label={t.reports.needRestock} value={urgentItemsCount} tone="success" />
         </div>
       </Card>
 
@@ -122,7 +125,7 @@ export const WeeklyReportPage: React.FC = () => {
       {/* Generate Button */}
       <Button
         variant="primary"
-        className="w-full sm:w-auto mb-4 flex items-center justify-center gap-2"
+        className="w-full sm:w-auto mb-6 flex items-center justify-center gap-2"
         onClick={handleGenerateReport}
         disabled={loading}
       >
@@ -147,12 +150,12 @@ export const WeeklyReportPage: React.FC = () => {
           </div>
         </Card>
       ) : (
-        <div>
+        <div className="max-w-3xl mt-4">
           <h2 className="text-lg font-semibold text-coffee-700 mb-3 flex items-center gap-2">
             <Icon name="warning" size={24} className="text-red-600" />
             <span>{t.reports.lowStockList}</span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          <div className="space-y-4">
             {lowStockItems.map(item => {
               const suggestedQuantity = Math.max(item.threshold * 2 - item.quantity, item.threshold);
               
@@ -167,7 +170,7 @@ export const WeeklyReportPage: React.FC = () => {
                         </span>
                       </div>
                       
-                      <div className="text-sm space-y-1">
+                      <div className="text-sm space-y-2">
                         <div className="flex justify-between">
                           <span className="text-coffee-400">{t.reports.currentStock}：</span>
                           <span className="text-red-600 font-bold">
@@ -191,13 +194,13 @@ export const WeeklyReportPage: React.FC = () => {
       )}
 
       {/* Info Card */}
-      <Card className="mt-4 bg-cream-100">
+      <Card className="max-w-3xl mt-4 bg-cream-100">
         <div className="text-sm text-coffee-600 space-y-2">
           <p className="font-semibold flex items-center gap-2">
             <Icon name="lightbulb" size={18} />
             <span>{t.reports.usageInstructions}</span>
           </p>
-          <ul className="list-disc list-inside space-y-1 text-xs ml-4">
+          <ul className="list-disc list-inside space-y-2 text-xs ml-4">
             <li>{t.reports.instructions.autoDetect}</li>
             <li>{t.reports.instructions.clickGenerate}</li>
             <li>{t.reports.instructions.suggestedQty}</li>

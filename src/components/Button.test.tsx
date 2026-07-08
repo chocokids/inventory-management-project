@@ -19,19 +19,19 @@ describe('Button 组件测试', () => {
   it('应该应用 primary 样式', () => {
     render(<Button variant="primary">主要按钮</Button>);
     const button = screen.getByText('主要按钮');
-    expect(button).toHaveClass('bg-coffee-500');
+    expect(button).toHaveClass('bg-coffee-600');
   });
 
   it('应该应用 secondary 样式', () => {
     render(<Button variant="secondary">次要按钮</Button>);
     const button = screen.getByText('次要按钮');
-    expect(button).toHaveClass('bg-cream-200');
+    expect(button).toHaveClass('bg-gray-100');
   });
 
   it('应该应用 danger 样式', () => {
     render(<Button variant="danger">危险按钮</Button>);
     const button = screen.getByText('危险按钮');
-    expect(button).toHaveClass('bg-red-500');
+    expect(button).toHaveClass('bg-red-600');
   });
 
   it('禁用时不应触发点击事件', () => {
@@ -53,9 +53,9 @@ describe('Button 组件测试', () => {
     expect(screen.getByText('小按钮')).toHaveClass('text-sm');
     
     rerender(<Button size="md">中按钮</Button>);
-    expect(screen.getByText('中按钮')).toHaveClass('text-base');
+    expect(screen.getByText('中按钮')).toHaveClass('text-sm');
     
     rerender(<Button size="lg">大按钮</Button>);
-    expect(screen.getByText('大按钮')).toHaveClass('text-lg');
+    expect(screen.getByText('大按钮')).toHaveClass('text-base');
   });
 });

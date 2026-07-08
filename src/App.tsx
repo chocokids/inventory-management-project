@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BottomNav } from './components/BottomNav';
 import { SideNav } from './components/SideNav';
 import { InventoryPage } from './pages/InventoryPage';
@@ -72,11 +72,11 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-cream-50 md:bg-gradient-to-br md:from-cream-100 md:to-cream-200">
-      <div className="flex min-h-screen">
+    <div className="min-h-screen bg-[#f6f7f9]">
+      <div className="flex min-h-screen overflow-x-hidden">
         <SideNav items={navItems} activeTab={activeTab} onTabChange={setActiveTab} />
         <div className="flex-1 flex flex-col min-w-0">
-          <main className="flex-1 w-full bg-white min-h-screen lg:mx-4 lg:my-4 lg:rounded-2xl lg:shadow-xl lg:overflow-hidden lg:min-h-[calc(100vh-2rem)]">
+          <main className="flex-1 min-w-0 bg-white min-h-screen lg:m-4 lg:rounded-2xl lg:border lg:border-gray-200 lg:shadow-sm lg:overflow-hidden lg:min-h-[calc(100vh-2rem)]">
             {renderPage()}
           </main>
           <BottomNav items={navItems} activeTab={activeTab} onTabChange={setActiveTab} />

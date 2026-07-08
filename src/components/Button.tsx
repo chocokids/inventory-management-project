@@ -13,19 +13,24 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles =
+    'font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coffee-300/80 focus-visible:ring-offset-2 tracking-[0.01em]';
   
   const variantStyles = {
-    primary: 'bg-coffee-500 hover:bg-coffee-600 text-white shadow-md hover:shadow-lg',
-    secondary: 'bg-cream-200 hover:bg-cream-300 text-coffee-700 shadow hover:shadow-md',
-    danger: 'bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg',
-    outline: 'border-2 border-coffee-500 text-coffee-600 hover:bg-coffee-50',
+    primary:
+      'bg-coffee-600 text-white hover:bg-coffee-700',
+    secondary:
+      'bg-gray-100 border border-gray-200 text-coffee-700 hover:bg-gray-200',
+    danger:
+      'bg-red-600 text-white hover:bg-red-700',
+    outline:
+      'border border-gray-300 text-coffee-700 bg-white hover:bg-gray-50',
   };
 
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
+    sm: 'px-3 py-2 text-sm',
+    md: 'px-4 py-2.5 text-sm',
+    lg: 'px-6 py-3 text-base',
   };
 
   return (
