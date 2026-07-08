@@ -13,6 +13,7 @@ import {
   getLowStockItems,
 } from '../utils/db';
 import { generateAndDownloadPurchaseList } from '../utils/generateMarkdown';
+import { PageLayout } from '../components/PageLayout';
 import { useLanguage } from '../i18n/LanguageContext';
 
 export const InventoryPage: React.FC = () => {
@@ -231,11 +232,11 @@ export const InventoryPage: React.FC = () => {
   const isLowStock = (item: InventoryItem) => item.quantity <= item.threshold;
 
   return (
-    <div className="p-4 pb-20">
+    <PageLayout>
       {/* Header with Action Buttons */}
       <div className="mb-6">
-        <div className="flex items-center justify-between gap-2 mb-1">
-          <h1 className="text-2xl font-bold text-coffee-700 flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-1">
+          <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
             <Icon name="inventory_2" size={28} />
             {t.inventory.title}
           </h1>
@@ -302,7 +303,7 @@ export const InventoryPage: React.FC = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-3">
         <div className="bg-cream-100 rounded-lg p-2 text-center">
           <p className="text-xs text-coffee-500">{t.inventory.totalItems}</p>
           <p className="text-lg font-bold text-coffee-700">{inventory.length}</p>
@@ -395,9 +396,9 @@ export const InventoryPage: React.FC = () => {
       )}
 
       {/* Inventory List */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {inventory.length === 0 ? (
-          <Card>
+          <Card className="md:col-span-2 xl:col-span-3">
             <div className="text-center py-8 text-coffee-400">
               <p className="text-4xl mb-2">📦</p>
               <p>{t.inventory.noProducts}</p>
@@ -405,7 +406,7 @@ export const InventoryPage: React.FC = () => {
             </div>
           </Card>
         ) : filteredInventory.length === 0 ? (
-          <Card>
+          <Card className="md:col-span-2 xl:col-span-3">
             <div className="text-center py-8 text-coffee-400">
               <p className="text-4xl mb-2">🔍</p>
               <p>{t.inventory.noFilterResults}</p>
@@ -551,7 +552,7 @@ export const InventoryPage: React.FC = () => {
           </div>
         </form>
       </Modal>
-    </div>
+    </PageLayout>
   );
 };
 

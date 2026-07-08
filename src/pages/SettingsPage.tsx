@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
 import { initializeSampleData } from '../utils/db';
 import { useLanguage } from '../i18n/LanguageContext';
+import { PageLayout } from '../components/PageLayout';
 
 export const SettingsPage: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
@@ -153,18 +154,19 @@ export const SettingsPage: React.FC = () => {
   const buildDate = '2024-11-10';
 
   return (
-    <div className="p-4 pb-20">
+    <PageLayout>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-coffee-700 flex items-center gap-2">
+        <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
           <Icon name="settings" size={28} />
           {t.settings.title}
         </h1>
         <p className="text-sm text-coffee-400 mt-1">{t.settings.subtitle}</p>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Language Settings */}
-      <Card className="mb-4" title={t.settings.language}>
+      <Card className="mb-0" title={t.settings.language}>
         <div className="space-y-3">
           <label className="block text-sm font-medium text-coffee-700 mb-2">
             {t.settings.languageLabel}
@@ -182,7 +184,7 @@ export const SettingsPage: React.FC = () => {
       </Card>
 
       {/* App Info */}
-      <Card className="mb-4 bg-gradient-to-br from-cream-100 to-coffee-100">
+      <Card className="mb-0 bg-gradient-to-br from-cream-100 to-coffee-100">
         <div className="text-center">
           <p className="text-4xl mb-3">☕️</p>
           <h2 className="text-xl font-bold text-coffee-700 mb-1">{t.settings.appInfo}</h2>
@@ -195,9 +197,9 @@ export const SettingsPage: React.FC = () => {
       </Card>
 
       {/* Data Management */}
-      <Card className="mb-4" title={t.settings.dataManagement}>
+      <Card className="mb-0 lg:col-span-2" title={t.settings.dataManagement}>
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             <Button
               variant="primary"
               className="flex items-center justify-center gap-2"
@@ -242,7 +244,7 @@ export const SettingsPage: React.FC = () => {
       </Card>
 
       {/* PWA Settings */}
-      <Card className="mb-4" title={t.settings.appSettings}>
+      <Card className="mb-0" title={t.settings.appSettings}>
         <div className="space-y-3">
           <Button
             variant="primary"
@@ -260,7 +262,7 @@ export const SettingsPage: React.FC = () => {
       </Card>
 
       {/* Features */}
-      <Card className="mb-4" title={t.settings.features}>
+      <Card className="mb-0" title={t.settings.features}>
         <div className="space-y-2 text-sm text-coffee-600">
           <div className="flex items-start gap-2">
             <Icon name="check_circle" size={18} className="text-green-600 flex-shrink-0" />
@@ -294,8 +296,8 @@ export const SettingsPage: React.FC = () => {
       </Card>
 
       {/* Tech Stack */}
-      <Card className="mb-4" title={t.settings.techStack}>
-        <div className="grid grid-cols-2 gap-2 text-xs">
+      <Card className="mb-0" title={t.settings.techStack}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
           <div className="bg-cream-100 p-2 rounded-lg">
             <p className="text-coffee-400">{t.settings.tech.frontend}</p>
             <p className="font-semibold text-coffee-700">React + TypeScript</p>
@@ -316,7 +318,7 @@ export const SettingsPage: React.FC = () => {
       </Card>
 
       {/* About */}
-      <Card className="bg-cream-50">
+      <Card className="mb-0 lg:col-span-2 bg-cream-50">
         <div className="text-center text-sm text-coffee-500">
           <p className="mb-2">☕️</p>
           <p>{t.settings.about}</p>
@@ -324,7 +326,8 @@ export const SettingsPage: React.FC = () => {
           <p className="text-xs text-coffee-400 mt-4">© 2024 {t.settings.copyright}</p>
         </div>
       </Card>
-    </div>
+      </div>
+    </PageLayout>
   );
 };
 

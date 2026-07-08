@@ -14,6 +14,7 @@ import {
   getMonthlyWorkDays,
 } from '../utils/db';
 import { useLanguage } from '../i18n/LanguageContext';
+import { PageLayout } from '../components/PageLayout';
 
 export const EmployeePage: React.FC = () => {
   const { t } = useLanguage();
@@ -161,10 +162,10 @@ export const EmployeePage: React.FC = () => {
   };
 
   return (
-    <div className="p-4 pb-20">
+    <PageLayout>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-coffee-700 flex items-center gap-2">
+        <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
           <Icon name="group" size={28} />
           {t.employees.title}
         </h1>
@@ -208,9 +209,9 @@ export const EmployeePage: React.FC = () => {
       </Button>
 
       {/* Employee List */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {employees.length === 0 ? (
-          <Card>
+          <Card className="md:col-span-2 xl:col-span-3">
             <div className="text-center py-8 text-coffee-400">
               <Icon name="group" size={48} className="mx-auto mb-2" />
               <p>{t.employees.noEmployees}</p>
@@ -407,7 +408,7 @@ export const EmployeePage: React.FC = () => {
           </div>
         </form>
       </Modal>
-    </div>
+    </PageLayout>
   );
 };
 

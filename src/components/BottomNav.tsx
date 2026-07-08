@@ -15,8 +15,8 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ items, activeTab, onTabChange }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-cream-200 shadow-lg z-50">
-      <div className="flex justify-around items-center h-16 max-w-md mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-cream-200 shadow-lg z-50 md:hidden">
+      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
         {items.map(item => (
           <button
             key={item.id}

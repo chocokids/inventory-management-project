@@ -17,6 +17,7 @@ import {
 } from '../utils/db';
 import { generateAndDownloadPayroll } from '../utils/generatePayroll';
 import { useLanguage } from '../i18n/LanguageContext';
+import { PageLayout } from '../components/PageLayout';
 
 export const AttendancePage: React.FC = () => {
   const { t, language } = useLanguage();
@@ -229,11 +230,11 @@ export const AttendancePage: React.FC = () => {
   };
 
   return (
-    <div className="p-4 pb-20">
+    <PageLayout>
       {/* Header with Action Button */}
       <div className="mb-6">
-        <div className="flex items-center justify-between gap-2 mb-1">
-          <h1 className="text-2xl font-bold text-coffee-700 flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-1">
+          <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
             <Icon name="event_note" size={28} />
             {t.attendance.title}
           </h1>
@@ -248,8 +249,9 @@ export const AttendancePage: React.FC = () => {
         <p className="text-sm text-coffee-400">{t.attendance.subtitle}</p>
       </div>
 
-      {/* Today Summary */}
-      <Card className="mb-4 bg-gradient-to-br from-blue-50 to-cyan-50">
+      {/* Today Summary & Payroll */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 mb-0">
         <h3 className="font-semibold text-coffee-700 mb-3 flex items-center gap-2">
           <Icon name="today" size={20} />
           {t.attendance.todayAttendance}
@@ -269,8 +271,8 @@ export const AttendancePage: React.FC = () => {
       </Card>
 
       {/* Payroll Generator */}
-      <Card className="mb-4" title={`💰 ${t.attendance.generatePayroll}`}>
-        <div className="flex gap-2 items-end">
+      <Card className="mb-0" title={`💰 ${t.attendance.generatePayroll}`}>
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
           <div className="flex-1">
             <label className="block text-sm font-medium text-coffee-700 mb-1">{t.attendance.selectMonth}</label>
             <div className="flex gap-2">
@@ -304,6 +306,7 @@ export const AttendancePage: React.FC = () => {
           </Button>
         </div>
       </Card>
+      </div>
 
       {/* Recent Attendance */}
       <div className="mb-3 flex items-center justify-between">
@@ -408,7 +411,7 @@ export const AttendancePage: React.FC = () => {
       )}
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-3">
         <div className="bg-cream-100 rounded-lg p-2 text-center">
           <p className="text-xs text-coffee-500">{t.common.total}</p>
           <p className="text-lg font-bold text-coffee-700">{attendance.length}</p>
@@ -425,9 +428,9 @@ export const AttendancePage: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {attendance.length === 0 ? (
-          <Card>
+          <Card className="md:col-span-2 xl:col-span-3">
             <div className="text-center py-8 text-coffee-400">
               <Icon name="event_note" size={48} className="mx-auto mb-2" />
               <p>{t.attendance.noAttendance}</p>
@@ -435,7 +438,7 @@ export const AttendancePage: React.FC = () => {
             </div>
           </Card>
         ) : filteredAttendance.length === 0 ? (
-          <Card>
+          <Card className="md:col-span-2 xl:col-span-3">
             <div className="text-center py-8 text-coffee-400">
               <p className="text-4xl mb-2">🔍</p>
               <p>{t.inventory.noFilterResults}</p>
@@ -584,7 +587,7 @@ export const AttendancePage: React.FC = () => {
           </div>
         </form>
       </Modal>
-    </div>
+    </PageLayout>
   );
 };
 

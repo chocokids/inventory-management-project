@@ -52,16 +52,14 @@ button {
 
 /* Responsive Design */
 @media (min-width: 768px) {
-  /* Desktop: Add subtle border to the main container */
   body {
     background: linear-gradient(135deg, #faf7f5 0%, #f5ede7 100%);
   }
 }
 
 @media (max-width: 767px) {
-  /* Mobile: Full screen without borders */
   body {
-    background: #ffffff;
+    background: #faf7f5;
   }
 }
 

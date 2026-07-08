@@ -5,6 +5,7 @@ import { Icon } from '../components/Icon';
 import { getLowStockItems, InventoryItem } from '../utils/db';
 import { generateAndDownloadPurchaseList } from '../utils/generateMarkdown';
 import { useLanguage } from '../i18n/LanguageContext';
+import { PageLayout } from '../components/PageLayout';
 
 export const WeeklyReportPage: React.FC = () => {
   const { t, language } = useLanguage();
@@ -68,18 +69,19 @@ export const WeeklyReportPage: React.FC = () => {
   };
 
   return (
-    <div className="p-4 pb-20">
+    <PageLayout>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-coffee-700 flex items-center gap-2">
+        <h1 className="text-2xl lg:text-3xl font-bold text-coffee-700 flex items-center gap-2">
           <Icon name="assessment" size={28} />
           {t.reports.title}
         </h1>
         <p className="text-sm text-coffee-400 mt-1">{t.reports.subtitle}</p>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
       {/* Summary Card */}
-      <Card className="mb-4 bg-gradient-to-br from-red-50 to-orange-50">
+      <Card className="mb-0 bg-gradient-to-br from-red-50 to-orange-50">
         <div className="text-center">
           <p className="text-sm text-coffee-600 mb-2">{t.reports.lowStockCount}</p>
           <p className="text-5xl font-bold text-red-600 mb-2">{lowStockItems.length}</p>
@@ -89,19 +91,8 @@ export const WeeklyReportPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Generate Button */}
-      <Button
-        variant="primary"
-        className="w-full mb-4 flex items-center justify-center gap-2"
-        onClick={handleGenerateReport}
-        disabled={loading}
-      >
-        <Icon name="download" size={20} />
-        <span>{t.reports.generateDownload}</span>
-      </Button>
-
       {/* Category Breakdown */}
-      <Card className="mb-4" title={t.reports.categoryBreakdown}>
+      <Card className="mb-0" title={t.reports.categoryBreakdown}>
         <div className="space-y-2">
           {[
             { key: 'ingredients', icon: 'grass' },
@@ -126,6 +117,18 @@ export const WeeklyReportPage: React.FC = () => {
           })}
         </div>
       </Card>
+      </div>
+
+      {/* Generate Button */}
+      <Button
+        variant="primary"
+        className="w-full sm:w-auto mb-4 flex items-center justify-center gap-2"
+        onClick={handleGenerateReport}
+        disabled={loading}
+      >
+        <Icon name="download" size={20} />
+        <span>{t.reports.generateDownload}</span>
+      </Button>
 
       {/* Low Stock Items List */}
       {loading ? (
@@ -149,7 +152,7 @@ export const WeeklyReportPage: React.FC = () => {
             <Icon name="warning" size={24} className="text-red-600" />
             <span>{t.reports.lowStockList}</span>
           </h2>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {lowStockItems.map(item => {
               const suggestedQuantity = Math.max(item.threshold * 2 - item.quantity, item.threshold);
               
@@ -202,7 +205,7 @@ export const WeeklyReportPage: React.FC = () => {
           </ul>
         </div>
       </Card>
-    </div>
+    </PageLayout>
   );
 };
 

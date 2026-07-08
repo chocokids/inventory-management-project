@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BottomNav } from './components/BottomNav';
+import { SideNav } from './components/SideNav';
 import { InventoryPage } from './pages/InventoryPage';
 import { EmployeePage } from './pages/EmployeePage';
 import { AttendancePage } from './pages/AttendancePage';
@@ -71,10 +72,15 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-cream-50 md:bg-transparent">
-      <div className="max-w-md mx-auto min-h-screen bg-white md:shadow-2xl relative">
-        {renderPage()}
-        <BottomNav items={navItems} activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="min-h-screen bg-cream-50 md:bg-gradient-to-br md:from-cream-100 md:to-cream-200">
+      <div className="flex min-h-screen">
+        <SideNav items={navItems} activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="flex-1 flex flex-col min-w-0">
+          <main className="flex-1 w-full bg-white min-h-screen lg:mx-4 lg:my-4 lg:rounded-2xl lg:shadow-xl lg:overflow-hidden lg:min-h-[calc(100vh-2rem)]">
+            {renderPage()}
+          </main>
+          <BottomNav items={navItems} activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
       </div>
     </div>
   );
