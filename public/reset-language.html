@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset Language</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f5ede7;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #8b6f47;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #6d5637;
+        }
+        .success {
+            color: green;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>☕️ Language Reset Tool</h1>
+        <p>Click the button below to reset the language settings:</p>
+        <button onclick="resetLanguage()">Reset to Chinese (中文)</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function resetLanguage() {
+            try {
+                // Clear language setting
+                localStorage.removeItem('appLanguage');
+                // Set to Chinese
+                localStorage.setItem('appLanguage', 'zh');
+                
+                document.getElementById('result').innerHTML = 
+                    '<p class="success">✅ Language reset successful!<br>语言已重置为中文！<br><br>' +
+                    '<a href="/">Go back to app / 返回应用</a></p>';
+                
+                // Auto redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } catch (e) {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color:red">❌ Error: ' + e.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,21 @@
+{
+  "name": "咖啡店管理系统",
+  "short_name": "咖啡管理",
+  "description": "咖啡店库存、员工、采购清单管理",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf7f5",
+  "theme_color": "#7d5a3a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
+
+
+
