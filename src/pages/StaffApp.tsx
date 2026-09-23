@@ -35,6 +35,8 @@ export const StaffApp: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<'inventory' | 'attendance'>('inventory');
   const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
   const [employeeId, setEmployeeId] = useState<number | ''>('');
   const [clockIn, setClockIn] = useState('09:00');
   const [clockOut, setClockOut] = useState('18:00');
@@ -85,6 +87,38 @@ export const StaffApp: React.FC = () => {
       .filter((r) => r.date.slice(0, 10) === day)
       .sort((a, b) => a.employeeName.localeCompare(b.employeeName));
   }, [data]);
+
+  const categoryOptions = useMemo(
+    () => [
+      { value: 'all', label: t.inventory.categories.all },
+      { value: 'produce', label: t.inventory.categories.produce },
+      { value: 'dairy', label: t.inventory.categories.dairy },
+      { value: 'bakery', label: t.inventory.categories.bakery },
+      { value: 'sauce', label: t.inventory.categories.sauce },
+      { value: 'beverage', label: t.inventory.categories.beverage },
+      { value: 'frozen', label: t.inventory.categories.frozen },
+      { value: 'ingredients', label: t.inventory.categories.ingredients },
+      { value: 'supplies', label: t.inventory.categories.supplies },
+      { value: 'other', label: t.inventory.categories.other },
+    ],
+    [t],
+  );
+
+  const filteredInventory = useMemo(() => {
+    if (!data) return [];
+    let items = [...data.inventory];
+    const keyword = searchKeyword.trim().toLowerCase();
+    if (keyword) {
+      items = items.filter((item) => item.name.toLowerCase().includes(keyword));
+    }
+    if (filterCategory !== 'all') {
+      items = items.filter((item) => item.category === filterCategory);
+    }
+    return items.sort((a, b) => a.name.localeCompare(b.name, language));
+  }, [data, searchKeyword, filterCategory, language]);
+
+  const getCategoryLabel = (key: string) =>
+    categoryOptions.find((c) => c.value === key)?.label || key;
 
   /** Prefill form from today's record when employee changes (save still upserts). */
   const fillFromToday = (empId: number, source: AppData) => {
@@ -238,12 +272,30 @@ export const StaffApp: React.FC = () => {
         {!data ? (
           <p className="text-center text-gray-500 py-8">{t.common.loading}</p>
         ) : tab === 'inventory' ? (
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3">
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3 min-w-0">
             <p className="text-sm text-gray-500">{t.staff.inventoryHint}</p>
+            <Input
+              label={t.common.search}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              placeholder={t.staff.searchPlaceholder}
+            />
+            <Select
+              label={t.staff.categoryFilter}
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              options={categoryOptions}
+            />
+            <p className="text-xs text-gray-400">
+              {t.staff.filterResultCount} {filteredInventory.length} /{' '}
+              {data.inventory.length}
+            </p>
             {data.inventory.length === 0 ? (
               <p className="text-sm text-gray-400">{t.staff.noInventory}</p>
+            ) : filteredInventory.length === 0 ? (
+              <p className="text-sm text-gray-400">{t.staff.noFilterResults}</p>
             ) : (
-              data.inventory.map((item) => (
+              filteredInventory.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-0"
@@ -252,16 +304,19 @@ export const StaffApp: React.FC = () => {
                     <p className="font-medium text-gray-900 truncate">
                       {item.name}
                     </p>
-                    <p className="text-xs text-gray-500">{item.unit}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {getCategoryLabel(item.category)} · {item.unit}
+                    </p>
                   </div>
                   <input
                     type="number"
-                    className="w-24 px-3 py-2 border border-gray-200 rounded-xl"
+                    className="w-24 max-w-[30%] shrink-0 px-3 py-2 border border-gray-200 rounded-xl"
                     value={quantities[item.id] ?? item.quantity}
                     onChange={(e) =>
                       setQuantities((prev) => ({
                         ...prev,
-                        [item.id]: Number(e.target.value),
+                        [item.id]:
+                          e.target.value === '' ? 0 : Number(e.target.value),
                       }))
                     }
                   />

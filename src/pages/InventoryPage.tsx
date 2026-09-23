@@ -38,6 +38,12 @@ export const InventoryPage: React.FC = () => {
 
   // Category keys are language-independent, we translate them on display
   const categories = [
+    { value: 'produce', label: `🥬 ${t.inventory.categories.produce}` },
+    { value: 'dairy', label: `🥛 ${t.inventory.categories.dairy}` },
+    { value: 'bakery', label: `🍰 ${t.inventory.categories.bakery}` },
+    { value: 'sauce', label: `🫙 ${t.inventory.categories.sauce}` },
+    { value: 'beverage', label: `🥤 ${t.inventory.categories.beverage}` },
+    { value: 'frozen', label: `🧊 ${t.inventory.categories.frozen}` },
     { value: 'ingredients', label: `🌱 ${t.inventory.categories.ingredients}` },
     { value: 'supplies', label: `📦 ${t.inventory.categories.supplies}` },
     { value: 'cleaning', label: `🧹 ${t.inventory.categories.cleaning}` },
@@ -83,6 +89,12 @@ export const InventoryPage: React.FC = () => {
   const getCategoryLabel = (categoryKey: string): string => {
     const categoryMap: { [key: string]: string } = {
       'all': t.inventory.categories.all,
+      'produce': t.inventory.categories.produce,
+      'dairy': t.inventory.categories.dairy,
+      'bakery': t.inventory.categories.bakery,
+      'sauce': t.inventory.categories.sauce,
+      'beverage': t.inventory.categories.beverage,
+      'frozen': t.inventory.categories.frozen,
       'ingredients': t.inventory.categories.ingredients,
       'supplies': t.inventory.categories.supplies,
       'cleaning': t.inventory.categories.cleaning,
