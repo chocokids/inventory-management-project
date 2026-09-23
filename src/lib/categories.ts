@@ -9,11 +9,8 @@ export const INVENTORY_CATEGORY_KEYS = [
   'bakery',
   'sauce',
   'beverage',
-  'frozen',
   'ingredients',
   'supplies',
-  'cleaning',
-  'equipment',
   'other',
 ] as const;
 
@@ -26,11 +23,8 @@ export const CATEGORY_ICONS: Record<InventoryCategoryKey | 'all', string> = {
   bakery: '🍰',
   sauce: '🫙',
   beverage: '🥤',
-  frozen: '🧊',
   ingredients: '🌱',
   supplies: '📦',
-  cleaning: '🧹',
-  equipment: '🔧',
   other: '📌',
 };
 

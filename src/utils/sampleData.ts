@@ -11,7 +11,7 @@ export const getSampleData = (language: 'zh' | 'ja' | 'en') => {
         { name: '一次性杯子 - 中杯', qty: 50, unit: 'piece', threshold: 100, category: 'supplies' },
         { name: '杯盖', qty: 80, unit: 'piece', threshold: 100, category: 'supplies' },
         { name: '吸管', qty: 45, unit: 'pack', threshold: 20, category: 'supplies' },
-        { name: '抹布', qty: 8, unit: 'strip', threshold: 10, category: 'cleaning' },
+        { name: '抹布', qty: 8, unit: 'strip', threshold: 10, category: 'supplies' },
       ],
       employees: [
         { name: '李晓明', position: 'manager', rate: 25 },
@@ -29,7 +29,7 @@ export const getSampleData = (language: 'zh' | 'ja' | 'en') => {
         { name: '使い捨てカップ - 中', qty: 50, unit: 'piece', threshold: 100, category: 'supplies' },
         { name: 'カップ蓋', qty: 80, unit: 'piece', threshold: 100, category: 'supplies' },
         { name: 'ストロー', qty: 45, unit: 'pack', threshold: 20, category: 'supplies' },
-        { name: '布巾', qty: 8, unit: 'strip', threshold: 10, category: 'cleaning' },
+        { name: '布巾', qty: 8, unit: 'strip', threshold: 10, category: 'supplies' },
       ],
       employees: [
         { name: '田中太郎', position: 'manager', rate: 25 },
@@ -47,7 +47,7 @@ export const getSampleData = (language: 'zh' | 'ja' | 'en') => {
         { name: 'Disposable Cups - Medium', qty: 50, unit: 'piece', threshold: 100, category: 'supplies' },
         { name: 'Cup Lids', qty: 80, unit: 'piece', threshold: 100, category: 'supplies' },
         { name: 'Straws', qty: 45, unit: 'pack', threshold: 20, category: 'supplies' },
-        { name: 'Cleaning Cloth', qty: 8, unit: 'strip', threshold: 10, category: 'cleaning' },
+        { name: 'Cleaning Cloth', qty: 8, unit: 'strip', threshold: 10, category: 'supplies' },
       ],
       employees: [
         { name: 'John Smith', position: 'manager', rate: 25 },

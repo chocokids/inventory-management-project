@@ -45,11 +45,8 @@ export const WeeklyReportPage: React.FC = () => {
       'bakery': t.inventory.categories.bakery,
       'sauce': t.inventory.categories.sauce,
       'beverage': t.inventory.categories.beverage,
-      'frozen': t.inventory.categories.frozen,
       'ingredients': t.inventory.categories.ingredients,
       'supplies': t.inventory.categories.supplies,
-      'cleaning': t.inventory.categories.cleaning,
-      'equipment': t.inventory.categories.equipment,
       'other': t.inventory.categories.other,
     };
     return categoryMap[categoryKey] || categoryKey;
@@ -82,11 +79,8 @@ export const WeeklyReportPage: React.FC = () => {
     'bakery',
     'sauce',
     'beverage',
-    'frozen',
     'ingredients',
     'supplies',
-    'cleaning',
-    'equipment',
     'other',
   ].filter(category => getCategoryCount(category) > 0).length;
 
@@ -120,11 +114,8 @@ export const WeeklyReportPage: React.FC = () => {
             { key: 'bakery', icon: 'cake' },
             { key: 'sauce', icon: 'opacity' },
             { key: 'beverage', icon: 'local_cafe' },
-            { key: 'frozen', icon: 'ac_unit' },
             { key: 'ingredients', icon: 'grass' },
             { key: 'supplies', icon: 'inventory_2' },
-            { key: 'cleaning', icon: 'cleaning_services' },
-            { key: 'equipment', icon: 'hardware' },
             { key: 'other', icon: 'more_horiz' },
           ].map((cat) => {
             const count = getCategoryCount(cat.key);

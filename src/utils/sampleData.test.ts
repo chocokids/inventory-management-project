@@ -63,7 +63,7 @@ describe('示例数据测试', () => {
 
   it('所有库存类别应该使用英文键', () => {
     const data = getSampleData('zh');
-    const validCategories = ['ingredients', 'supplies', 'cleaning', 'equipment', 'other'];
+    const validCategories = ['produce', 'dairy', 'bakery', 'sauce', 'beverage', 'ingredients', 'supplies', 'other'];
     
     data.inventory.forEach(item => {
       expect(validCategories).toContain(item.category);

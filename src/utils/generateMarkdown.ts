@@ -154,11 +154,8 @@ const getCategoryEmoji = (category: string): string => {
     'bakery': '🍰',
     'sauce': '🫙',
     'beverage': '🥤',
-    'frozen': '🧊',
     'ingredients': '🌱',
     'supplies': '📦',
-    'cleaning': '🧹',
-    'equipment': '🔧',
     'other': '📌',
   };
   return emojiMap[category] || '📌';
