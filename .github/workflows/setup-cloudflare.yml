@@ -4,6 +4,9 @@ name: Setup Cloudflare Worker
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -15,7 +18,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: worker/package-lock.json
 
@@ -33,10 +36,12 @@ jobs:
           echo "$OUT"
           ID=$(echo "$OUT" | grep -oE 'id = "[a-f0-9]{32}"' | head -1 | grep -oE '[a-f0-9]{32}' || true)
           if [ -z "$ID" ]; then
-            # Already exists — pick from list
             LIST=$(npx wrangler kv namespace list 2>&1)
             echo "$LIST"
             ID=$(echo "$LIST" | grep -i STORE | grep -oE '[a-f0-9]{32}' | head -1 || true)
+          fi
+          if [ -z "$ID" ]; then
+            ID=$(echo "$LIST" | grep -oE '[a-f0-9]{32}' | head -1 || true)
           fi
           if [ -z "$ID" ]; then
             echo "Could not resolve KV namespace id"
@@ -44,8 +49,8 @@ jobs:
           fi
           echo "KV_ID=$ID" >> "$GITHUB_OUTPUT"
           echo "Using KV id: $ID"
-          sed -i "s/id = \".*\"/id = \"$ID\"/" wrangler.toml
-          sed -i "s/preview_id = \".*\"/preview_id = \"$ID\"/" wrangler.toml
+          sed -i "s/^id = \".*\"/id = \"$ID\"/" wrangler.toml
+          sed -i "s/^preview_id = \".*\"/preview_id = \"$ID\"/" wrangler.toml
           cat wrangler.toml
 
       - name: Deploy Worker
@@ -63,14 +68,14 @@ jobs:
             exit 1
           fi
           echo "WORKER_URL=$URL" >> "$GITHUB_OUTPUT"
-          echo "### Cloudflare setup" >> "$GITHUB_STEP_SUMMARY"
-          echo "- KV id: \`${{ steps.kv.outputs.KV_ID }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Worker URL: \`$URL\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Set GitHub Actions variable \`VITE_API_URL\` to that URL, then re-run Pages deploy." >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "### Cloudflare setup"
+            echo "- KV id: \`${{ steps.kv.outputs.KV_ID }}\`"
+            echo "- Worker URL: \`$URL\`"
+            echo "- Set GitHub Actions variable \`VITE_API_URL\` to that URL, then re-run Pages deploy."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit wrangler.toml with KV id
-        env:
-          KV_ID: ${{ steps.kv.outputs.KV_ID }}
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
