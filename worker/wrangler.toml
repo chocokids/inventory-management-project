@@ -8,5 +8,5 @@ workers_dev = true
 # Placeholder works for `wrangler dev` local simulation.
 [[kv_namespaces]]
 binding = "STORE"
-id = "00000000000000000000000000000001"
-preview_id = "00000000000000000000000000000001"
+id = "33d7ca81d9ff4cf49d89bbc9228ade09"
+preview_id = "33d7ca81d9ff4cf49d89bbc9228ade09"
