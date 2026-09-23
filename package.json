@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:worker": "npm run dev --prefix worker",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -15,6 +16,7 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.28.0",
     "dexie": "^3.2.4",
     "dexie-react-hooks": "^1.1.7"
   },
@@ -41,7 +43,3 @@
     "@vitest/coverage-v8": "^1.0.4"
   }
 }
-
-
-
-

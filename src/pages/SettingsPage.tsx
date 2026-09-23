@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
+import { Input } from '../components/Input';
 import { initializeSampleData } from '../utils/db';
 import { useLanguage } from '../i18n/LanguageContext';
 import { PageLayout } from '../components/PageLayout';
+import { getApiBase, isCloudEnabled, patchCloudSettings } from '../lib/api';
+import { pullCloudToLocal, pushLocalToCloud } from '../lib/sync';
+import { setAuthenticated } from '../lib/auth';
 
 type ImportedInventoryRow = { lastUpdated: string } & Record<string, unknown>;
 type ImportedEmployeeRow = { hireDate: string } & Record<string, unknown>;
@@ -12,6 +17,54 @@ type ImportedAttendanceRow = { date: string } & Record<string, unknown>;
 
 export const SettingsPage: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
+  const [syncBusy, setSyncBusy] = useState(false);
+  const [bossPin, setBossPin] = useState('');
+  const [staffPin, setStaffPin] = useState('');
+
+  const handlePullCloud = async () => {
+    setSyncBusy(true);
+    try {
+      await pullCloudToLocal();
+      alert('Pulled from cloud');
+      window.location.reload();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Pull failed');
+    } finally {
+      setSyncBusy(false);
+    }
+  };
+
+  const handlePushCloud = async () => {
+    setSyncBusy(true);
+    try {
+      await pushLocalToCloud();
+      alert('Pushed to cloud');
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Push failed');
+    } finally {
+      setSyncBusy(false);
+    }
+  };
+
+  const handleSavePins = async () => {
+    if (!bossPin && !staffPin) return;
+    try {
+      await patchCloudSettings({
+        ...(bossPin ? { bossPin } : {}),
+        ...(staffPin ? { staffPin } : {}),
+      });
+      setBossPin('');
+      setStaffPin('');
+      alert('PIN updated');
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'PIN update failed');
+    }
+  };
+
+  const handleLogout = () => {
+    setAuthenticated('boss', false);
+    window.location.reload();
+  };
 
   const handleInitSampleData = async () => {
     if (window.confirm(t.settings.clearWarning)) {
@@ -169,6 +222,66 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       <div className="max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Cloud Sync */}
+      <Card className="mb-0 lg:col-span-2" title="Cloud sync">
+        <p className="text-sm text-coffee-500 mb-3">
+          API: {isCloudEnabled() ? getApiBase() : 'not configured'}
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+          <Button
+            variant="primary"
+            disabled={syncBusy || !isCloudEnabled()}
+            onClick={() => void handlePullCloud()}
+          >
+            Pull from cloud
+          </Button>
+          <Button
+            variant="secondary"
+            disabled={syncBusy || !isCloudEnabled()}
+            onClick={() => void handlePushCloud()}
+          >
+            Push local to cloud
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Input
+            label="New boss PIN"
+            type="password"
+            value={bossPin}
+            onChange={(e) => setBossPin(e.target.value)}
+            placeholder="Leave blank to keep"
+          />
+          <Input
+            label="New staff PIN"
+            type="password"
+            value={staffPin}
+            onChange={(e) => setStaffPin(e.target.value)}
+            placeholder="Leave blank to keep"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2 mt-2">
+          <Button
+            variant="outline"
+            disabled={!isCloudEnabled() || (!bossPin && !staffPin)}
+            onClick={() => void handleSavePins()}
+          >
+            Save PINs
+          </Button>
+          <Link
+            to="/staff"
+            className="inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-300 text-coffee-700 bg-white hover:bg-gray-50"
+          >
+            Open staff page
+          </Link>
+          <Button variant="danger" onClick={handleLogout}>
+            Logout
+          </Button>
+        </div>
+        <p className="text-xs text-coffee-400 mt-3">
+          Defaults: boss 2468 / staff 1234 (change after first deploy)
+        </p>
+      </Card>
+
       {/* Language Settings */}
       <Card className="mb-0" title={t.settings.language}>
         <div className="space-y-3">

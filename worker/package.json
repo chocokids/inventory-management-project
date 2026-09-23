@@ -1,0 +1,17 @@
+{
+  "name": "inventory-api",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "coffee-shop-management": "file:..",
+    "hono": "^4.7.10"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "wrangler": "^4.16.0"
+  }
+}

@@ -4,6 +4,28 @@
 
 ![Coffee Shop Management](https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800)
 
+## ☁️ 双端同步（Cloudflare Worker）
+
+与整理券项目相同：同一静态站双入口 + Worker/KV。
+
+| 入口 | 地址 | 默认 PIN |
+|------|------|----------|
+| 老板总结 | `/` | `2468` |
+| 员工录入 | `/staff` | `1234` |
+
+详见 [deploy/GITHUB_PAGES.md](deploy/GITHUB_PAGES.md)。
+
+本地：
+
+```bash
+npm install
+npm install --prefix worker
+# 终端 1
+npm run dev --prefix worker
+# 终端 2（需 .env.local 中 VITE_API_URL=http://127.0.0.1:8787）
+npm run dev
+```
+
 ## ✨ 功能特性
 
 ### 📦 库存管理

@@ -1,0 +1,12 @@
+name = "inventory-api"
+main = "src/index.ts"
+compatibility_date = "2025-05-01"
+workers_dev = true
+
+# Create with: npx wrangler kv namespace create STORE
+# Then paste the id below (and preview_id for local).
+# Placeholder works for `wrangler dev` local simulation.
+[[kv_namespaces]]
+binding = "STORE"
+id = "00000000000000000000000000000001"
+preview_id = "00000000000000000000000000000001"

@@ -71,17 +71,25 @@ export const getAllInventory = async (): Promise<InventoryItem[]> => {
 
 // 添加库存商品
 export const addInventoryItem = async (item: Omit<InventoryItem, 'id'>): Promise<number> => {
-  return (await db.inventory.add(item)) as number;
+  const id = (await db.inventory.add(item)) as number;
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
+  return id;
 };
 
 // 更新库存商品
 export const updateInventoryItem = async (id: number, updates: Partial<InventoryItem>): Promise<number> => {
-  return await db.inventory.update(id, { ...updates, lastUpdated: new Date() });
+  const result = await db.inventory.update(id, { ...updates, lastUpdated: new Date() });
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
+  return result;
 };
 
 // 删除库存商品
 export const deleteInventoryItem = async (id: number): Promise<void> => {
   await db.inventory.delete(id);
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
 };
 
 // 获取低库存商品
@@ -99,17 +107,25 @@ export const getAllEmployees = async (): Promise<Employee[]> => {
 
 // 添加员工
 export const addEmployee = async (employee: Omit<Employee, 'id'>): Promise<number> => {
-  return (await db.employees.add(employee)) as number;
+  const id = (await db.employees.add(employee)) as number;
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
+  return id;
 };
 
 // 更新员工信息
 export const updateEmployee = async (id: number, updates: Partial<Employee>): Promise<number> => {
-  return await db.employees.update(id, updates);
+  const result = await db.employees.update(id, updates);
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
+  return result;
 };
 
 // 删除员工
 export const deleteEmployee = async (id: number): Promise<void> => {
   await db.employees.delete(id);
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
 };
 
 // 计算员工工资
@@ -143,17 +159,25 @@ export const getAttendanceByDateRange = async (
 
 // 添加考勤记录
 export const addAttendance = async (attendance: Omit<AttendanceRecord, 'id'>): Promise<number> => {
-  return (await db.attendance.add(attendance)) as number;
+  const id = (await db.attendance.add(attendance)) as number;
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
+  return id;
 };
 
 // 更新考勤记录
 export const updateAttendance = async (id: number, updates: Partial<AttendanceRecord>): Promise<number> => {
-  return await db.attendance.update(id, updates);
+  const result = await db.attendance.update(id, updates);
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
+  return result;
 };
 
 // 删除考勤记录
 export const deleteAttendance = async (id: number): Promise<void> => {
   await db.attendance.delete(id);
+  const { schedulePushToCloud } = await import('../lib/sync');
+  schedulePushToCloud();
 };
 
 // 计算两个时间之间的工时
@@ -221,109 +245,134 @@ export const getMonthlyPayroll = async (year: number, month: number) => {
 
 import { getSampleData } from './sampleData';
 
-export const initializeSampleData = async (language: 'zh' | 'ja' | 'en' = 'zh') => {
-  // 检查用户是否主动清除过数据
-  const userClearedData = localStorage.getItem('userClearedData');
-  if (userClearedData === 'true') {
-    // 如果用户主动清除过数据，不再自动初始化
-    return;
-  }
-  
-  // 检查是否已有数据
-  const inventoryCount = await db.inventory.count();
-  const employeeCount = await db.employees.count();
-  
-  // 获取对应语言的示例数据
-  const sampleData = getSampleData(language);
+/** Prevents React StrictMode double-mount from seeding sample data twice. */
+let sampleInitPromise: Promise<void> | null = null;
 
-  if (inventoryCount === 0) {
-    // 添加示例库存数据（使用对应语言）
-    const inventoryData = sampleData.inventory.map((item, index) => ({
-      name: item.name,
-      quantity: item.qty,
-      unit: item.unit,
-      threshold: item.threshold,
-      category: item.category,
-      imageUrl: `https://images.unsplash.com/photo-${['1559056199-641a0ac8b55e', '1447933601403-0c6688de566e', '1550583724-b2692b85b150', '1571091718767-18b5b1457add', '1514228742587-6b1558fcca3d', '1509042239860-f550ce710b93', '1625772452859-1c03d5bf1137', '1563453392212-326f5e854473'][index]}?w=400`,
-      lastUpdated: new Date(),
-    }));
-    await db.inventory.bulkAdd(inventoryData);
-  }
+export const initializeSampleData = async (
+  language: 'zh' | 'ja' | 'en' = 'zh',
+): Promise<void> => {
+  if (sampleInitPromise) return sampleInitPromise;
 
-  if (employeeCount === 0) {
-    // 添加示例员工数据（使用对应语言）
-    const employeeData = sampleData.employees.map((item, index) => ({
-      name: item.name,
-      position: item.position,
-      hourlyRate: item.rate,
-      hoursWorked: [160, 140, 120, 60][index],
-      dailyTransportAllowance: [20, 15, 15, 10][index], // 店长20，咖啡师15，兼职10
-      phone: `${language === 'en' ? '+1-555-000' : '138-0000'}-${String(index + 1).padStart(4, '0')}`,
-      email: `${item.name.toLowerCase().replace(/\s+/g, '')}@example.com`,
-      hireDate: new Date(['2023-01-15', '2023-03-20', '2023-06-10', '2024-01-05'][index]),
-    }));
-    const employeeIds = await db.employees.bulkAdd(employeeData, { allKeys: true });
-    
-    // 添加示例考勤数据（最近7天）
-    const attendanceCount = await db.attendance.count();
-    if (attendanceCount === 0 && employeeIds.length > 0) {
-      const attendanceRecords: Omit<AttendanceRecord, 'id'>[] = [];
-      const today = new Date();
-      
-      // 为每个员工添加最近7天的考勤
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        
-        // 第一位员工 - 店长/经理（全勤）
-        attendanceRecords.push({
-          employeeId: employeeIds[0] as number,
-          employeeName: sampleData.employees[0].name,
-          date: new Date(date),
-          clockIn: '09:00',
-          clockOut: '18:00',
-          hoursWorked: 9,
-          notes: language === 'zh' ? '正常出勤' : language === 'ja' ? '通常勤務' : 'Regular shift',
-        });
-        
-        // 第二位员工 - 咖啡师（早班）
-        attendanceRecords.push({
-          employeeId: employeeIds[1] as number,
-          employeeName: sampleData.employees[1].name,
-          date: new Date(date),
-          clockIn: '08:00',
-          clockOut: '16:00',
-          hoursWorked: 8,
-        });
-        
-        // 第三位员工 - 咖啡师（晚班）
-        if (i % 2 === 0) { // 隔天上班
-          attendanceRecords.push({
-            employeeId: employeeIds[2] as number,
-            employeeName: sampleData.employees[2].name,
-            date: new Date(date),
-            clockIn: '14:00',
-            clockOut: '22:00',
-            hoursWorked: 8,
-          });
-        }
-        
-        // 第四位员工 - 兼职（周末）
-        if (date.getDay() === 0 || date.getDay() === 6) {
-          attendanceRecords.push({
-            employeeId: employeeIds[3] as number,
-            employeeName: sampleData.employees[3].name,
-            date: new Date(date),
-            clockIn: '10:00',
-            clockOut: '18:00',
-            hoursWorked: 8,
-            notes: language === 'zh' ? '周末兼职' : language === 'ja' ? '週末パート' : 'Weekend shift',
-          });
-        }
-      }
-      
-      await db.attendance.bulkAdd(attendanceRecords);
+  sampleInitPromise = (async () => {
+    // 检查用户是否主动清除过数据
+    const userClearedData = localStorage.getItem('userClearedData');
+    if (userClearedData === 'true') {
+      return;
     }
+
+    await db.transaction(
+      'rw',
+      db.inventory,
+      db.employees,
+      db.attendance,
+      async () => {
+        const inventoryCount = await db.inventory.count();
+        const employeeCount = await db.employees.count();
+        const sampleData = getSampleData(language);
+
+        if (inventoryCount === 0) {
+          const inventoryData = sampleData.inventory.map((item, index) => ({
+            name: item.name,
+            quantity: item.qty,
+            unit: item.unit,
+            threshold: item.threshold,
+            category: item.category,
+            imageUrl: `https://images.unsplash.com/photo-${['1559056199-641a0ac8b55e', '1447933601403-0c6688de566e', '1550583724-b2692b85b150', '1571091718767-18b5b1457add', '1514228742587-6b1558fcca3d', '1509042239860-f550ce710b93', '1625772452859-1c03d5bf1137', '1563453392212-326f5e854473'][index]}?w=400`,
+            lastUpdated: new Date(),
+          }));
+          await db.inventory.bulkAdd(inventoryData);
+        }
+
+        if (employeeCount === 0) {
+          const employeeData = sampleData.employees.map((item, index) => ({
+            name: item.name,
+            position: item.position,
+            hourlyRate: item.rate,
+            hoursWorked: [160, 140, 120, 60][index],
+            dailyTransportAllowance: [20, 15, 15, 10][index],
+            phone: `${language === 'en' ? '+1-555-000' : '138-0000'}-${String(index + 1).padStart(4, '0')}`,
+            email: `${item.name.toLowerCase().replace(/\s+/g, '')}@example.com`,
+            hireDate: new Date(
+              ['2023-01-15', '2023-03-20', '2023-06-10', '2024-01-05'][index],
+            ),
+          }));
+          const employeeIds = await db.employees.bulkAdd(employeeData, {
+            allKeys: true,
+          });
+
+          const attendanceCount = await db.attendance.count();
+          if (attendanceCount === 0 && employeeIds.length > 0) {
+            const attendanceRecords: Omit<AttendanceRecord, 'id'>[] = [];
+            const today = new Date();
+
+            for (let i = 6; i >= 0; i--) {
+              const date = new Date(today);
+              date.setDate(date.getDate() - i);
+
+              attendanceRecords.push({
+                employeeId: employeeIds[0] as number,
+                employeeName: sampleData.employees[0].name,
+                date: new Date(date),
+                clockIn: '09:00',
+                clockOut: '18:00',
+                hoursWorked: 9,
+                notes:
+                  language === 'zh'
+                    ? '正常出勤'
+                    : language === 'ja'
+                      ? '通常勤務'
+                      : 'Regular shift',
+              });
+
+              attendanceRecords.push({
+                employeeId: employeeIds[1] as number,
+                employeeName: sampleData.employees[1].name,
+                date: new Date(date),
+                clockIn: '08:00',
+                clockOut: '16:00',
+                hoursWorked: 8,
+              });
+
+              if (i % 2 === 0) {
+                attendanceRecords.push({
+                  employeeId: employeeIds[2] as number,
+                  employeeName: sampleData.employees[2].name,
+                  date: new Date(date),
+                  clockIn: '14:00',
+                  clockOut: '22:00',
+                  hoursWorked: 8,
+                });
+              }
+
+              if (date.getDay() === 0 || date.getDay() === 6) {
+                attendanceRecords.push({
+                  employeeId: employeeIds[3] as number,
+                  employeeName: sampleData.employees[3].name,
+                  date: new Date(date),
+                  clockIn: '10:00',
+                  clockOut: '18:00',
+                  hoursWorked: 8,
+                  notes:
+                    language === 'zh'
+                      ? '周末兼职'
+                      : language === 'ja'
+                        ? '週末パート'
+                        : 'Weekend shift',
+                });
+              }
+            }
+
+            await db.attendance.bulkAdd(attendanceRecords);
+          }
+        }
+      },
+    );
+  })();
+
+  try {
+    await sampleInitPromise;
+  } finally {
+    sampleInitPromise = null;
   }
 };
 
