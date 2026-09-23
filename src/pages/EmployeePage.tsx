@@ -28,14 +28,24 @@ export const EmployeePage: React.FC = () => {
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
   });
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    position: string;
+    hourlyRate: number | '';
+    dailyTransportAllowance: number | '';
+    phone: string;
+    email: string;
+  }>({
     name: '',
     position: 'barista',
     hourlyRate: 18,
-    dailyTransportAllowance: 0,
+    dailyTransportAllowance: '',
     phone: '',
     email: '',
   });
+
+  const parseNumberInput = (value: string): number | '' =>
+    value === '' ? '' : Number(value);
 
   const positions = [
     { value: 'manager', label: `👔 ${t.employees.positions.manager}` },
@@ -90,7 +100,7 @@ export const EmployeePage: React.FC = () => {
         name: employee.name,
         position: employee.position,
         hourlyRate: employee.hourlyRate,
-        dailyTransportAllowance: employee.dailyTransportAllowance || 0,
+        dailyTransportAllowance: employee.dailyTransportAllowance ?? '',
         phone: employee.phone || '',
         email: employee.email || '',
       });
@@ -99,8 +109,8 @@ export const EmployeePage: React.FC = () => {
       setFormData({
         name: '',
         position: 'barista',
-        hourlyRate: 18,
-        dailyTransportAllowance: 0,
+        hourlyRate: '',
+        dailyTransportAllowance: '',
         phone: '',
         email: '',
       });
@@ -115,16 +125,25 @@ export const EmployeePage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const payload = {
+      name: formData.name,
+      position: formData.position,
+      hourlyRate: formData.hourlyRate === '' ? 0 : formData.hourlyRate,
+      dailyTransportAllowance:
+        formData.dailyTransportAllowance === ''
+          ? 0
+          : formData.dailyTransportAllowance,
+      phone: formData.phone,
+      email: formData.email,
+      hoursWorked: 0,
+    };
     
     if (editingEmployee?.id) {
-      await updateEmployee(editingEmployee.id, {
-        ...formData,
-        hoursWorked: 0, // 保留字段但不使用
-      });
+      await updateEmployee(editingEmployee.id, payload);
     } else {
       await addEmployee({
-        ...formData,
-        hoursWorked: 0, // 新员工工时为0
+        ...payload,
         hireDate: new Date(),
       });
     }
@@ -339,8 +358,12 @@ export const EmployeePage: React.FC = () => {
             label={`${t.employees.hourlyRate} (${t.employees.currency}/${t.employees.hours})`}
             type="number"
             value={formData.hourlyRate}
-            onChange={e => setFormData({ ...formData, hourlyRate: Number(e.target.value) })}
-            onFocus={e => e.target.select()}
+            onChange={e =>
+              setFormData({
+                ...formData,
+                hourlyRate: parseNumberInput(e.target.value),
+              })
+            }
             required
             min="0"
             step="0.5"
@@ -351,8 +374,12 @@ export const EmployeePage: React.FC = () => {
             label={`${t.employees.dailyTransportAllowance} (${t.employees.currency})`}
             type="number"
             value={formData.dailyTransportAllowance}
-            onChange={e => setFormData({ ...formData, dailyTransportAllowance: Number(e.target.value) })}
-            onFocus={e => e.target.select()}
+            onChange={e =>
+              setFormData({
+                ...formData,
+                dailyTransportAllowance: parseNumberInput(e.target.value),
+              })
+            }
             min="0"
             step="1"
             placeholder="0"
@@ -395,7 +422,10 @@ export const EmployeePage: React.FC = () => {
                 <div>
                   <span className="text-coffee-500">{t.employees.salaryCalculation}：</span>
                   <span className="font-bold text-coffee-700">
-                    {t.employees.currency}{((employeeHours[editingEmployee.id!] || 0) * formData.hourlyRate).toFixed(2)}
+                    {t.employees.currency}{(
+                      (employeeHours[editingEmployee.id!] || 0) *
+                      (formData.hourlyRate === '' ? 0 : formData.hourlyRate)
+                    ).toFixed(2)}
                   </span>
                 </div>
               </div>

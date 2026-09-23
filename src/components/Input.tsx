@@ -5,16 +5,21 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export const Input: React.FC<InputProps> = ({ label, error, className = '', ...props }) => {
+export const Input: React.FC<InputProps> = ({ label, error, className = '', type, ...props }) => {
+  const isTemporal = type === 'time' || type === 'date' || type === 'datetime-local';
+
   return (
-    <div className="mb-4">
+    <div className="mb-4 w-full min-w-0">
       {label && (
         <label className="block text-sm font-medium text-coffee-700 mb-1.5">
           {label}
         </label>
       )}
       <input
-        className={`w-full px-3.5 py-2.5 border rounded-xl bg-white text-coffee-700 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-coffee-300/90 focus:border-coffee-300 transition-shadow ${
+        type={type}
+        className={`box-border w-full max-w-full min-w-0 px-3.5 py-2.5 border rounded-xl bg-white text-coffee-700 placeholder:text-coffee-300 focus:outline-none focus:ring-2 focus:ring-coffee-300/90 focus:border-coffee-300 transition-shadow ${
+          isTemporal ? 'appearance-none [-webkit-appearance:none] block' : ''
+        } ${
           error ? 'border-red-400 focus:ring-red-200' : 'border-cream-300'
         } ${className}`}
         {...props}

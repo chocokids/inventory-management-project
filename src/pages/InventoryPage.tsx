@@ -52,6 +52,8 @@ export const InventoryPage: React.FC = () => {
     { value: 'bottle', label: t.inventory.units.bottle },
     { value: 'piece', label: t.inventory.units.piece },
     { value: 'pack', label: t.inventory.units.pack },
+    { value: 'bag', label: t.inventory.units.bag },
+    { value: 'case', label: t.inventory.units.case },
     { value: 'strip', label: t.inventory.units.strip },
   ];
 
@@ -64,6 +66,8 @@ export const InventoryPage: React.FC = () => {
       'bottle': t.inventory.units.bottle,
       'piece': t.inventory.units.piece,
       'pack': t.inventory.units.pack,
+      'bag': t.inventory.units.bag,
+      'case': t.inventory.units.case,
       'strip': t.inventory.units.strip,
       // Legacy Chinese keys for backward compatibility
       '升': t.inventory.units.liter,

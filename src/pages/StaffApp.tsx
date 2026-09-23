@@ -218,7 +218,7 @@ export const StaffApp: React.FC = () => {
         </Button>
       </div>
 
-      <main className="px-4 pb-8 max-w-lg mx-auto space-y-4">
+      <main className="px-4 pb-8 max-w-lg mx-auto space-y-4 min-w-0 w-full">
         {error ? (
           <p className="text-sm text-red-600 bg-red-50 rounded-xl p-3">{error}</p>
         ) : null}
@@ -271,7 +271,7 @@ export const StaffApp: React.FC = () => {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-2xl border border-gray-200 p-4">
+            <div className="bg-white rounded-2xl border border-gray-200 p-4 min-w-0 overflow-hidden">
               <Select
                 label={t.staff.employee}
                 value={employeeId === '' ? '' : String(employeeId)}
@@ -288,12 +288,14 @@ export const StaffApp: React.FC = () => {
                 type="time"
                 value={clockIn}
                 onChange={(e) => setClockIn(e.target.value)}
+                className="w-full max-w-full"
               />
               <Input
                 label={t.staff.clockOut}
                 type="time"
                 value={clockOut}
                 onChange={(e) => setClockOut(e.target.value)}
+                className="w-full max-w-full"
               />
               <Input
                 label={t.staff.notes}
