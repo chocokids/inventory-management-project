@@ -14,6 +14,7 @@ import type { AppData } from '../../shared/types';
 import { calculateHours } from '../utils/db';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { Language } from '../i18n/translations';
+import { getCategoryLabel, getCategorySelectOptions } from '../lib/categories';
 
 function todayLocalISODate(): string {
   const d = new Date();
@@ -89,18 +90,7 @@ export const StaffApp: React.FC = () => {
   }, [data]);
 
   const categoryOptions = useMemo(
-    () => [
-      { value: 'all', label: t.inventory.categories.all },
-      { value: 'produce', label: t.inventory.categories.produce },
-      { value: 'dairy', label: t.inventory.categories.dairy },
-      { value: 'bakery', label: t.inventory.categories.bakery },
-      { value: 'sauce', label: t.inventory.categories.sauce },
-      { value: 'beverage', label: t.inventory.categories.beverage },
-      { value: 'frozen', label: t.inventory.categories.frozen },
-      { value: 'ingredients', label: t.inventory.categories.ingredients },
-      { value: 'supplies', label: t.inventory.categories.supplies },
-      { value: 'other', label: t.inventory.categories.other },
-    ],
+    () => getCategorySelectOptions(t, { includeAll: true }),
     [t],
   );
 
@@ -117,8 +107,7 @@ export const StaffApp: React.FC = () => {
     return items.sort((a, b) => a.name.localeCompare(b.name, language));
   }, [data, searchKeyword, filterCategory, language]);
 
-  const getCategoryLabel = (key: string) =>
-    categoryOptions.find((c) => c.value === key)?.label || key;
+  const categoryLabel = (key: string) => getCategoryLabel(t, key);
 
   /** Prefill form from today's record when employee changes (save still upserts). */
   const fillFromToday = (empId: number, source: AppData) => {
@@ -305,7 +294,7 @@ export const StaffApp: React.FC = () => {
                       {item.name}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
-                      {getCategoryLabel(item.category)} · {item.unit}
+                      {categoryLabel(item.category)} · {item.unit}
                     </p>
                   </div>
                   <input

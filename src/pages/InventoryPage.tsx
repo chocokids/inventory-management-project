@@ -16,6 +16,12 @@ import { generateAndDownloadPurchaseList } from '../utils/generateMarkdown';
 import { PageLayout } from '../components/PageLayout';
 import { useLanguage } from '../i18n/LanguageContext';
 import { StatCard } from '../components/StatCard';
+import {
+  CATEGORY_ICONS,
+  getCategoryLabel as sharedGetCategoryLabel,
+  getCategorySelectOptions,
+  INVENTORY_CATEGORY_KEYS,
+} from '../lib/categories';
 
 export const InventoryPage: React.FC = () => {
   const { t, language } = useLanguage();
@@ -32,23 +38,15 @@ export const InventoryPage: React.FC = () => {
     quantity: 0,
     unit: 'kg',
     threshold: 5,
-    category: 'ingredients',
+    category: 'produce',
     imageUrl: '',
   });
 
-  // Category keys are language-independent, we translate them on display
-  const categories = [
-    { value: 'produce', label: `🥬 ${t.inventory.categories.produce}` },
-    { value: 'dairy', label: `🥛 ${t.inventory.categories.dairy}` },
-    { value: 'bakery', label: `🍰 ${t.inventory.categories.bakery}` },
-    { value: 'sauce', label: `🫙 ${t.inventory.categories.sauce}` },
-    { value: 'beverage', label: `🥤 ${t.inventory.categories.beverage}` },
-    { value: 'frozen', label: `🧊 ${t.inventory.categories.frozen}` },
-    { value: 'ingredients', label: `🌱 ${t.inventory.categories.ingredients}` },
-    { value: 'supplies', label: `📦 ${t.inventory.categories.supplies}` },
-    { value: 'cleaning', label: `🧹 ${t.inventory.categories.cleaning}` },
-    { value: 'equipment', label: `🔧 ${t.inventory.categories.equipment}` },
-    { value: 'other', label: `📌 ${t.inventory.categories.other}` },
+  const categories = getCategorySelectOptions(t, { withIcons: true });
+
+  const filterCategoryKeys = [
+    'all' as const,
+    ...INVENTORY_CATEGORY_KEYS,
   ];
 
   const units = [
@@ -86,23 +84,8 @@ export const InventoryPage: React.FC = () => {
   };
 
   // Helper function to get translated category name
-  const getCategoryLabel = (categoryKey: string): string => {
-    const categoryMap: { [key: string]: string } = {
-      'all': t.inventory.categories.all,
-      'produce': t.inventory.categories.produce,
-      'dairy': t.inventory.categories.dairy,
-      'bakery': t.inventory.categories.bakery,
-      'sauce': t.inventory.categories.sauce,
-      'beverage': t.inventory.categories.beverage,
-      'frozen': t.inventory.categories.frozen,
-      'ingredients': t.inventory.categories.ingredients,
-      'supplies': t.inventory.categories.supplies,
-      'cleaning': t.inventory.categories.cleaning,
-      'equipment': t.inventory.categories.equipment,
-      'other': t.inventory.categories.other,
-    };
-    return categoryMap[categoryKey] || categoryKey;
-  };
+  const getCategoryLabel = (categoryKey: string): string =>
+    sharedGetCategoryLabel(t, categoryKey);
 
   const loadInventory = useCallback(async () => {
     const items = await getAllInventory();
@@ -196,7 +179,7 @@ export const InventoryPage: React.FC = () => {
         quantity: 0,
         unit: 'kg',
         threshold: 5,
-        category: 'ingredients',
+        category: 'produce',
         imageUrl: '',
       });
     }
@@ -336,24 +319,18 @@ export const InventoryPage: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-coffee-700 mb-2">{t.inventory.filterOptions.categoryLabel}</label>
             <div className="flex flex-wrap gap-2">
-              {[
-                { key: 'all', icon: '📦' },
-                { key: 'ingredients', icon: '🌱' },
-                { key: 'supplies', icon: '📦' },
-                { key: 'cleaning', icon: '🧹' },
-                { key: 'equipment', icon: '🔧' },
-                { key: 'other', icon: '📌' }
-              ].map(cat => (
+              {filterCategoryKeys.map((key) => (
                 <button
-                  key={cat.key}
-                  onClick={() => setFilterCategory(cat.key)}
+                  key={key}
+                  type="button"
+                  onClick={() => setFilterCategory(key)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                    filterCategory === cat.key
+                    filterCategory === key
                       ? 'bg-coffee-500 text-white shadow-md'
                       : 'bg-cream-100 text-coffee-600 hover:bg-cream-200'
                   }`}
                 >
-                  {cat.icon} {getCategoryLabel(cat.key)}
+                  {CATEGORY_ICONS[key]} {getCategoryLabel(key)}
                 </button>
               ))}
             </div>

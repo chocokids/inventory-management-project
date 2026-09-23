@@ -40,6 +40,12 @@ export const WeeklyReportPage: React.FC = () => {
   // Helper function to get translated category name
   const getCategoryLabel = (categoryKey: string): string => {
     const categoryMap: { [key: string]: string } = {
+      'produce': t.inventory.categories.produce,
+      'dairy': t.inventory.categories.dairy,
+      'bakery': t.inventory.categories.bakery,
+      'sauce': t.inventory.categories.sauce,
+      'beverage': t.inventory.categories.beverage,
+      'frozen': t.inventory.categories.frozen,
       'ingredients': t.inventory.categories.ingredients,
       'supplies': t.inventory.categories.supplies,
       'cleaning': t.inventory.categories.cleaning,
@@ -70,8 +76,19 @@ export const WeeklyReportPage: React.FC = () => {
   };
 
   const urgentItemsCount = lowStockItems.filter(item => item.quantity <= item.threshold / 2).length;
-  const affectedCategoriesCount = ['ingredients', 'supplies', 'cleaning', 'equipment', 'other']
-    .filter(category => getCategoryCount(category) > 0).length;
+  const affectedCategoriesCount = [
+    'produce',
+    'dairy',
+    'bakery',
+    'sauce',
+    'beverage',
+    'frozen',
+    'ingredients',
+    'supplies',
+    'cleaning',
+    'equipment',
+    'other',
+  ].filter(category => getCategoryCount(category) > 0).length;
 
   return (
     <PageLayout>
@@ -98,11 +115,17 @@ export const WeeklyReportPage: React.FC = () => {
       <Card className="mb-0" title={t.reports.categoryBreakdown}>
         <div className="space-y-2">
           {[
+            { key: 'produce', icon: 'eco' },
+            { key: 'dairy', icon: 'water_drop' },
+            { key: 'bakery', icon: 'cake' },
+            { key: 'sauce', icon: 'opacity' },
+            { key: 'beverage', icon: 'local_cafe' },
+            { key: 'frozen', icon: 'ac_unit' },
             { key: 'ingredients', icon: 'grass' },
             { key: 'supplies', icon: 'inventory_2' },
             { key: 'cleaning', icon: 'cleaning_services' },
             { key: 'equipment', icon: 'hardware' },
-            { key: 'other', icon: 'more_horiz' }
+            { key: 'other', icon: 'more_horiz' },
           ].map((cat) => {
             const count = getCategoryCount(cat.key);
 

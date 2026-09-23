@@ -149,6 +149,12 @@ export const generatePurchaseListMarkdown = (lowStockItems: InventoryItem[], lan
 // 根据类别返回对应的 emoji
 const getCategoryEmoji = (category: string): string => {
   const emojiMap: { [key: string]: string } = {
+    'produce': '🥬',
+    'dairy': '🥛',
+    'bakery': '🍰',
+    'sauce': '🫙',
+    'beverage': '🥤',
+    'frozen': '🧊',
     'ingredients': '🌱',
     'supplies': '📦',
     'cleaning': '🧹',
