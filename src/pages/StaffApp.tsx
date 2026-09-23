@@ -45,6 +45,13 @@ export const StaffApp: React.FC = () => {
     setAuthed(isAuthenticated('staff'));
   }, []);
 
+  // Auto-dismiss success toasts so they don't stick around forever
+  useEffect(() => {
+    if (!message) return;
+    const id = window.setTimeout(() => setMessage(null), 2500);
+    return () => window.clearTimeout(id);
+  }, [message]);
+
   const load = useCallback(async () => {
     try {
       const next = await fetchCloudData();
